@@ -33,7 +33,9 @@ model Todo {
   title         String
   description   String?
   completed     Boolean     @default(false)
-  updatedAt     DateTime    @default(now())
-  taskId       Int?
-  task         Task?      @relation(fields: [taskId], references: [id])
+  updatedAt     DateTime    @updatedAt
+  taskId        Int?
+  task          Task?       @relation(fields: [taskId], references: [id])
+
+  @@index([taskId], name: "fk_task")
 }

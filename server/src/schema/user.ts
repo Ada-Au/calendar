@@ -46,7 +46,7 @@ export const UserQuery = extendType({
   },
 })
 
-// Mutations
+// Mutation
 export const UserMutation = extendType({
   type: 'Mutation',
   definition(t) {

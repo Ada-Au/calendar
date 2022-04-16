@@ -31,16 +31,22 @@ const federatedSchema = transformSchemaFederation(schema, {
   Query: {
     extend: true,
   },
-  // User: {
-  //   keyFields: ['id'],
-  //   resolveReference(reference: any, ctx: any) {
-  //     return ctx.prisma.user.findUnique({ where: { id: reference.id } })
-  //   },
-  // },
+  User: {
+    keyFields: ['id'],
+    resolveReference(reference: any, ctx: any) {
+      return ctx.prisma.user.findUnique({ where: { id: reference.id } })
+    },
+  },
   Task: {
     keyFields: ['id'],
     resolveReference(reference: any, ctx: any) {
       return ctx.prisma.task.findUnique({ where: { id: reference.id } })
+    },
+  },
+  Todo: {
+    keyFields: ['id'],
+    resolveReference(reference: any, ctx: any) {
+      return ctx.prisma.todo.findUnique({ where: { id: reference.id } })
     },
   },
 })

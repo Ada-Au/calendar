@@ -1,7 +1,7 @@
 version: '1'
 services:
   mysql:
-    image: my-mysql:latest
+    image: calendar-mysql:latest
     restart: always
     ports:
       - 3306:3306
