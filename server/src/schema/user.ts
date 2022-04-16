@@ -2,10 +2,19 @@ import { Prisma } from '.prisma/client'
 import { addCrudResolvers } from '@ra-data-prisma/backend'
 import bcrypt from 'bcryptjs'
 import createError from 'http-errors'
-import { objectType, extendType } from 'nexus'
+import { stringArg, nonNull, objectType, extendType } from 'nexus'
+import jwt from 'jsonwebtoken'
 
 // For react admin
 export const crudUser = addCrudResolvers('User')
+
+export const AuthPayload = objectType({
+  name: 'AuthPayload',
+  description: 'Authentication Payload.',
+  definition(t) {
+    t.nonNull.string('token', { description: 'Authentication token.' })
+  },
+})
 
 // Type Defs
 export const User = objectType({
@@ -103,6 +112,51 @@ export const UserMutation = extendType({
         })
 
         return updatedUser
+      },
+    })
+    t.nonNull.field('login', {
+      type: 'AuthPayload',
+      description: 'Normal email and password login.',
+      args: {
+        email: nonNull(stringArg({ description: 'The user account email.' })),
+        password: nonNull(
+          stringArg({ description: 'The user account password.' }),
+        ),
+      },
+      async resolve(_root, { email, password }, { prisma }) {
+        const userSelectData = {
+          id: true,
+          password: true,
+          name: true,
+        }
+        let user = await prisma.user.findUnique({
+          where: { email },
+          select: userSelectData,
+        })
+
+        if (user) {
+          const passwordValid = await bcrypt.compare(password, user.password)
+          if (!passwordValid) {
+            throw createError(401, 'Invalid Password!')
+          }
+        } else {
+          throw createError(401, 'User not exist!')
+        }
+
+        const { id } = user
+        const token = jwt.sign(
+          {
+            user: {
+              id,
+              email,
+            },
+          },
+          process.env.APP_SECRET,
+        )
+
+        return {
+          token,
+        }
       },
     })
   },

@@ -434,6 +434,9 @@ export interface NexusGenObjects {
   AffectedRowsOutput: { // root type
     count: number; // Int!
   }
+  AuthPayload: { // root type
+    token: string; // String!
+  }
   Mutation: {};
   Query: {};
   Task: PrismaClient.Task;
@@ -455,12 +458,16 @@ export interface NexusGenFieldTypes {
   AffectedRowsOutput: { // field return type
     count: number; // Int!
   }
+  AuthPayload: { // field return type
+    token: string; // String!
+  }
   Mutation: { // field return type
     createOneTask: NexusGenRootTypes['Task']; // Task!
     createOneTodo: NexusGenRootTypes['Todo']; // Todo!
     createOneUser: NexusGenRootTypes['User']; // User!
     deleteManyUser: NexusGenRootTypes['AffectedRowsOutput']; // AffectedRowsOutput!
     deleteOneUser: NexusGenRootTypes['User'] | null; // User
+    login: NexusGenRootTypes['AuthPayload']; // AuthPayload!
     updateManyUser: NexusGenRootTypes['AffectedRowsOutput']; // AffectedRowsOutput!
     updateOneTask: NexusGenRootTypes['Task'] | null; // Task
     updateOneTodo: NexusGenRootTypes['Todo'] | null; // Todo
@@ -510,12 +517,16 @@ export interface NexusGenFieldTypeNames {
   AffectedRowsOutput: { // field return type name
     count: 'Int'
   }
+  AuthPayload: { // field return type name
+    token: 'String'
+  }
   Mutation: { // field return type name
     createOneTask: 'Task'
     createOneTodo: 'Todo'
     createOneUser: 'User'
     deleteManyUser: 'AffectedRowsOutput'
     deleteOneUser: 'User'
+    login: 'AuthPayload'
     updateManyUser: 'AffectedRowsOutput'
     updateOneTask: 'Task'
     updateOneTodo: 'Todo'
@@ -577,6 +588,10 @@ export interface NexusGenArgTypes {
     }
     deleteOneUser: { // args
       where: NexusGenInputs['UserWhereUniqueInput']; // UserWhereUniqueInput!
+    }
+    login: { // args
+      email: string; // String!
+      password: string; // String!
     }
     updateManyUser: { // args
       data: NexusGenInputs['UserUpdateManyMutationInput']; // UserUpdateManyMutationInput!

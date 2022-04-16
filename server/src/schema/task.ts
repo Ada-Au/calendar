@@ -1,5 +1,4 @@
 import { objectType, extendType } from 'nexus'
-import { resolve } from 'path'
 
 // Type Defs
 export const Task = objectType({

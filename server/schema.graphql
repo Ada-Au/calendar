@@ -6,6 +6,12 @@ type AffectedRowsOutput {
   count: Int!
 }
 
+"""Authentication Payload."""
+type AuthPayload {
+  """Authentication token."""
+  token: String!
+}
+
 input BoolFieldUpdateOperationsInput {
   set: Boolean
 }
@@ -71,6 +77,15 @@ type Mutation {
   createOneUser(data: UserCreateInput!): User!
   deleteManyUser(where: UserWhereInput): AffectedRowsOutput!
   deleteOneUser(where: UserWhereUniqueInput!): User
+
+  """Normal email and password login."""
+  login(
+    """The user account email."""
+    email: String!
+
+    """The user account password."""
+    password: String!
+  ): AuthPayload!
   updateManyUser(data: UserUpdateManyMutationInput!, where: UserWhereInput): AffectedRowsOutput!
   updateOneTask(data: TaskUpdateInput!, where: TaskWhereUniqueInput!): Task
   updateOneTodo(data: TodoUpdateInput!, where: TodoWhereUniqueInput!): Todo

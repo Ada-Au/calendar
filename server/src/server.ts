@@ -1,18 +1,23 @@
 import { ApolloServer } from 'apollo-server'
 import { applyMiddleware } from 'graphql-middleware'
+import { PrismaClient } from '@prisma/client'
+import jwt from 'jsonwebtoken'
 
 import schema from './schema'
 import { permissions } from './utils/permissions'
+import { getUser } from './authorization'
+
+const prisma = new PrismaClient()
 
 export const server = new ApolloServer({
   schema: applyMiddleware(schema, permissions),
   context: ({ req }) => {
-    const user = req.headers.user ? JSON.parse(req.headers.user) : null
-    const origin = req.headers.origin !== 'null' ? req.headers.origin : null
+    const token = req.headers.authentication as string
+    let user = getUser(token)
 
     return {
-      origin,
       user,
+      prisma,
     }
   },
   mocks: process.env.NODE_ENV === 'test',
