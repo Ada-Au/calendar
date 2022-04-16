@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "module": "commonjs",
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": ["esnext"],
+    "removeComments": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false
+  },
+  "include": ["./src"]
+}

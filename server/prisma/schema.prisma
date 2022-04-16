@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  name          String
+  email         String      @unique
+  password      String
+}
+
+model Task {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  title         String
+  description   String?
+  completed     Boolean     @default(false)
+  startTime     DateTime    @default(now())
+  endTime       DateTime?
+  isFullDay     Boolean     @default(false)
+  todos         Todo[]
+}
+
+model Todo {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now())
+  title         String
+  description   String?
+  completed     Boolean     @default(false)
+  updatedAt     DateTime    @default(now())
+  taskId       Int?
+  task         Task?      @relation(fields: [taskId], references: [id])
+}

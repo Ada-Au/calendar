@@ -1,0 +1,25 @@
+version: '1'
+services:
+  mysql:
+    image: my-mysql:latest
+    restart: always
+    ports:
+      - 3306:3306
+  server:
+    build: ./server
+    image: gcr.io/${PROJECT_ID}/server:${SERVICE_VERSION}
+    environment:
+      WAIT_HOSTS: mysql:3306
+      WAIT_HOSTS_TIMEOUT: 120
+    ports:
+      - '4001:4001'
+  frontend:
+    build: ./frontend
+    image: gcr.io/${PROJECT_ID}/frontend:${SERVICE_VERSION}
+    ports:
+      - '3001:3001'
+  admin:
+    build: ./admin
+    image: gcr.io/${PROJECT_ID}/admin:${SERVICE_VERSION}
+    ports:
+      - '3002:3002'
