@@ -13,6 +13,7 @@ export const permissions = shield(
       todos: isAuthenticated,
     },
     Mutation: {
+      signUp: allow,
       createOneUser: isAuthenticated,
       updateOneUser: isAuthenticated,
       updateManyUser: isAuthenticated,

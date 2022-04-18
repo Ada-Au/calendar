@@ -12,8 +12,9 @@ const prisma = new PrismaClient()
 export const server = new ApolloServer({
   schema: applyMiddleware(schema, permissions),
   context: ({ req }) => {
-    const token = req.headers.authentication as string
-    let user = getUser(token)
+    const token = req.headers.authorization as string
+    let user
+    if (token) user = getUser(token.split(' ')[1]) //  token = Bearer *****...
 
     return {
       user,

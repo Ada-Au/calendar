@@ -86,6 +86,18 @@ type Mutation {
     """The user account password."""
     password: String!
   ): AuthPayload!
+
+  """User sign up in site."""
+  signUp(
+    """The user account email."""
+    email: String!
+
+    """The user name."""
+    name: String!
+
+    """The user account password."""
+    password: String!
+  ): AuthPayload!
   updateManyUser(data: UserUpdateManyMutationInput!, where: UserWhereInput): AffectedRowsOutput!
   updateOneTask(data: TaskUpdateInput!, where: TaskWhereUniqueInput!): Task
   updateOneTodo(data: TodoUpdateInput!, where: TodoWhereUniqueInput!): Todo
@@ -260,6 +272,13 @@ input TaskCreateInput {
   startTime: DateTime
   title: String!
   todos: TodoCreateNestedManyWithoutTaskInput
+  user: UserCreateNestedOneWithoutTasksInput!
+}
+
+input TaskCreateNestedManyWithoutUserInput {
+  connect: [TaskWhereUniqueInput!]
+  connectOrCreate: [TaskCreateOrConnectWithoutUserInput!]
+  create: [TaskCreateWithoutUserInput!]
 }
 
 input TaskCreateNestedOneWithoutTodosInput {
@@ -273,6 +292,11 @@ input TaskCreateOrConnectWithoutTodosInput {
   where: TaskWhereUniqueInput!
 }
 
+input TaskCreateOrConnectWithoutUserInput {
+  create: TaskCreateWithoutUserInput!
+  where: TaskWhereUniqueInput!
+}
+
 input TaskCreateWithoutTodosInput {
   completed: Boolean
   createdAt: DateTime
@@ -281,6 +305,24 @@ input TaskCreateWithoutTodosInput {
   isFullDay: Boolean
   startTime: DateTime
   title: String!
+  user: UserCreateNestedOneWithoutTasksInput!
+}
+
+input TaskCreateWithoutUserInput {
+  completed: Boolean
+  createdAt: DateTime
+  description: String
+  endTime: DateTime
+  isFullDay: Boolean
+  startTime: DateTime
+  title: String!
+  todos: TodoCreateNestedManyWithoutTaskInput
+}
+
+input TaskListRelationFilter {
+  every: TaskWhereInput
+  none: TaskWhereInput
+  some: TaskWhereInput
 }
 
 input TaskOrderByInput {
@@ -292,6 +334,23 @@ input TaskOrderByInput {
   isFullDay: SortOrder
   startTime: SortOrder
   title: SortOrder
+  user: UserOrderByInput
+  userId: SortOrder
+}
+
+input TaskScalarWhereInput {
+  AND: [TaskScalarWhereInput!]
+  NOT: [TaskScalarWhereInput!]
+  OR: [TaskScalarWhereInput!]
+  completed: BoolFilter
+  createdAt: DateTimeFilter
+  description: StringNullableFilter
+  endTime: DateTimeNullableFilter
+  id: IntFilter
+  isFullDay: BoolFilter
+  startTime: DateTimeFilter
+  title: StringFilter
+  userId: IntFilter
 }
 
 input TaskUpdateInput {
@@ -303,6 +362,35 @@ input TaskUpdateInput {
   startTime: DateTimeFieldUpdateOperationsInput
   title: StringFieldUpdateOperationsInput
   todos: TodoUpdateManyWithoutTaskInput
+  user: UserUpdateOneRequiredWithoutTasksInput
+}
+
+input TaskUpdateManyMutationInput {
+  completed: BoolFieldUpdateOperationsInput
+  createdAt: DateTimeFieldUpdateOperationsInput
+  description: NullableStringFieldUpdateOperationsInput
+  endTime: NullableDateTimeFieldUpdateOperationsInput
+  isFullDay: BoolFieldUpdateOperationsInput
+  startTime: DateTimeFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+}
+
+input TaskUpdateManyWithWhereWithoutUserInput {
+  data: TaskUpdateManyMutationInput!
+  where: TaskScalarWhereInput!
+}
+
+input TaskUpdateManyWithoutUserInput {
+  connect: [TaskWhereUniqueInput!]
+  connectOrCreate: [TaskCreateOrConnectWithoutUserInput!]
+  create: [TaskCreateWithoutUserInput!]
+  delete: [TaskWhereUniqueInput!]
+  deleteMany: [TaskScalarWhereInput!]
+  disconnect: [TaskWhereUniqueInput!]
+  set: [TaskWhereUniqueInput!]
+  update: [TaskUpdateWithWhereUniqueWithoutUserInput!]
+  updateMany: [TaskUpdateManyWithWhereWithoutUserInput!]
+  upsert: [TaskUpsertWithWhereUniqueWithoutUserInput!]
 }
 
 input TaskUpdateOneWithoutTodosInput {
@@ -315,6 +403,11 @@ input TaskUpdateOneWithoutTodosInput {
   upsert: TaskUpsertWithoutTodosInput
 }
 
+input TaskUpdateWithWhereUniqueWithoutUserInput {
+  data: TaskUpdateWithoutUserInput!
+  where: TaskWhereUniqueInput!
+}
+
 input TaskUpdateWithoutTodosInput {
   completed: BoolFieldUpdateOperationsInput
   createdAt: DateTimeFieldUpdateOperationsInput
@@ -323,6 +416,24 @@ input TaskUpdateWithoutTodosInput {
   isFullDay: BoolFieldUpdateOperationsInput
   startTime: DateTimeFieldUpdateOperationsInput
   title: StringFieldUpdateOperationsInput
+  user: UserUpdateOneRequiredWithoutTasksInput
+}
+
+input TaskUpdateWithoutUserInput {
+  completed: BoolFieldUpdateOperationsInput
+  createdAt: DateTimeFieldUpdateOperationsInput
+  description: NullableStringFieldUpdateOperationsInput
+  endTime: NullableDateTimeFieldUpdateOperationsInput
+  isFullDay: BoolFieldUpdateOperationsInput
+  startTime: DateTimeFieldUpdateOperationsInput
+  title: StringFieldUpdateOperationsInput
+  todos: TodoUpdateManyWithoutTaskInput
+}
+
+input TaskUpsertWithWhereUniqueWithoutUserInput {
+  create: TaskCreateWithoutUserInput!
+  update: TaskUpdateWithoutUserInput!
+  where: TaskWhereUniqueInput!
 }
 
 input TaskUpsertWithoutTodosInput {
@@ -343,6 +454,8 @@ input TaskWhereInput {
   startTime: DateTimeFilter
   title: StringFilter
   todos: TodoListRelationFilter
+  user: UserWhereInput
+  userId: IntFilter
 }
 
 input TaskWhereUniqueInput {
@@ -511,9 +624,31 @@ type User {
 
   """The user account password."""
   password: String!
+
+  """Tasks that belong to the user"""
+  tasks(cursor: TaskWhereUniqueInput, skip: Int, take: Int): [Task!]!
 }
 
 input UserCreateInput {
+  createdAt: DateTime
+  email: String!
+  name: String!
+  password: String!
+  tasks: TaskCreateNestedManyWithoutUserInput
+}
+
+input UserCreateNestedOneWithoutTasksInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutTasksInput
+  create: UserCreateWithoutTasksInput
+}
+
+input UserCreateOrConnectWithoutTasksInput {
+  create: UserCreateWithoutTasksInput!
+  where: UserWhereUniqueInput!
+}
+
+input UserCreateWithoutTasksInput {
   createdAt: DateTime
   email: String!
   name: String!
@@ -533,6 +668,7 @@ input UserUpdateInput {
   email: StringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
   password: StringFieldUpdateOperationsInput
+  tasks: TaskUpdateManyWithoutUserInput
 }
 
 input UserUpdateManyMutationInput {
@@ -540,6 +676,26 @@ input UserUpdateManyMutationInput {
   email: StringFieldUpdateOperationsInput
   name: StringFieldUpdateOperationsInput
   password: StringFieldUpdateOperationsInput
+}
+
+input UserUpdateOneRequiredWithoutTasksInput {
+  connect: UserWhereUniqueInput
+  connectOrCreate: UserCreateOrConnectWithoutTasksInput
+  create: UserCreateWithoutTasksInput
+  update: UserUpdateWithoutTasksInput
+  upsert: UserUpsertWithoutTasksInput
+}
+
+input UserUpdateWithoutTasksInput {
+  createdAt: DateTimeFieldUpdateOperationsInput
+  email: StringFieldUpdateOperationsInput
+  name: StringFieldUpdateOperationsInput
+  password: StringFieldUpdateOperationsInput
+}
+
+input UserUpsertWithoutTasksInput {
+  create: UserCreateWithoutTasksInput!
+  update: UserUpdateWithoutTasksInput!
 }
 
 input UserWhereInput {
@@ -551,6 +707,7 @@ input UserWhereInput {
   id: IntFilter
   name: StringFilter
   password: StringFilter
+  tasks: TaskListRelationFilter
 }
 
 input UserWhereUniqueInput {

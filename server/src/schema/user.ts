@@ -30,8 +30,9 @@ export const User = objectType({
     t.model.createdAt({
       description:
         'The timestamp (UTC in ISO 9601 Standard) this user was created.',
-    }),
-      t.model.password({ description: 'The user account password.' })
+    })
+    t.model.password({ description: 'The user account password.' })
+    t.model.tasks({ description: 'Tasks that belong to the user' })
   },
 })
 
@@ -154,9 +155,39 @@ export const UserMutation = extendType({
           process.env.APP_SECRET,
         )
 
-        return {
-          token,
+        return { token }
+      },
+    })
+    t.nonNull.field('signUp', {
+      type: 'AuthPayload',
+      description: 'User sign up in site.',
+      args: {
+        name: nonNull(stringArg({ description: 'The user name.' })),
+        email: nonNull(stringArg({ description: 'The user account email.' })),
+        password: nonNull(
+          stringArg({ description: 'The user account password.' }),
+        ),
+      },
+      async resolve(_root, { name, email, password }, { prisma }) {
+        let duplicateUser = await prisma.user.findUnique({ where: { email } })
+        if (duplicateUser) {
+          throw createError(
+            403,
+            `${email} has already been registered with another account!`,
+          )
         }
+
+        const userCreateInput: Prisma.UserCreateInput = {
+          name,
+          email,
+          password,
+        }
+
+        const createdUser = await prisma.user.create({
+          data: userCreateInput,
+        })
+
+        return createdUser
       },
     })
   },

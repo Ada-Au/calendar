@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { ApolloProvider } from '@apollo/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+import { ThemeProvider } from '@mui/material/styles';
+import { NotificationContainer } from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
+
+import client from './apolloClient';
+import theme from './theme';
+
+import HomePage from './containers/HomePage';
+import LoginPage from './containers/LoginPage';
 
 function App() {
+  let history = createBrowserHistory();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ApolloProvider client={client}>
+      <ThemeProvider theme={theme}>
+        {/* <LanguageProvider messages={messages}> */}
+        <BrowserRouter history={history}>
+          <NotificationContainer />
+          <Routes>
+            <Route exact path="/" element={<HomePage />} />
+            <Route exact path="/login" element={<LoginPage />} />
+          </Routes>
+        </BrowserRouter>
+        {/* </LanguageProvider> */}
+      </ThemeProvider>
+    </ApolloProvider>
   );
 }
 
+{
+  /*
+   */
+}
 export default App;
