@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MonthView from './monthView';
+import MonthView from './MonthView';
 
 function Calendar({ showDrawer }) {
   const date = new Date();

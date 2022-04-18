@@ -13,6 +13,7 @@ function PasswordField({ onChange, error }) {
   return (
     <OutlinedInput
       size="small"
+      required
       type={showPassword ? 'text' : 'password'}
       onChange={onChange}
       error={error}

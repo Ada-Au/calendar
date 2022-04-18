@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   styled,
   Grid,
@@ -7,8 +7,11 @@ import {
   Typography,
   IconButton,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+
 import {
   DAY_IN_WEEK,
   DAY_IN_WEEK_STYLE,
@@ -44,6 +47,7 @@ const TextWrapper = styled('div')(() => ({
 
 // todo: show task time when hide drawer
 function MonthView({ diff = 0, showTaskTime }) {
+  const navigate = useNavigate();
   const [firstSelect, setFirstSelect] = useState();
   const [hoverSelect, setHoverSelect] = useState();
   const [secSelect, setSecSelect] = useState();
@@ -68,22 +72,22 @@ function MonthView({ diff = 0, showTaskTime }) {
 
     let style = {};
     if (
-      monthDiff == -1 ||
-      monthDiff == 11 || // 11 for before Jan (12 - 1)
-      monthDiff == 1 ||
-      monthDiff == 13 // 13 for after Dec (12 - -1)
+      monthDiff === -1 ||
+      monthDiff === 11 || // 11 for before Jan (12 - 1)
+      monthDiff === 1 ||
+      monthDiff === 13 // 13 for after Dec (12 - -1)
     )
       style = NON_CURRENT_MONTH_STYLE;
     else style = CURRENT_MONTH_STYLE;
 
-    if (showDate.getDay() == 6 || showDate.getDay() == 0)
+    if (showDate.getDay() === 6 || showDate.getDay() === 0)
       style = { ...style, ...NON_WEEKDAY_STYLE };
     else style = { ...style, ...WEEKDAY_STYLE };
 
     if (
-      showDate.getFullYear() == year &&
-      showDate.getMonth() == month &&
-      showDate.getDate() == today.getDate()
+      showDate.getFullYear() === year &&
+      showDate.getMonth() === today.getMonth() &&
+      showDate.getDate() === today.getDate()
     )
       style = { ...style, ...TODAY_STYLE };
 
@@ -101,13 +105,13 @@ function MonthView({ diff = 0, showTaskTime }) {
           style = { ...style, ...HOVER_STYLE };
       }
 
-    if (hoverSelect == showDateTime) {
+    if (hoverSelect === showDateTime) {
       style = { ...style, ...HOVER_STYLE };
     }
 
     if (
-      (firstSelect && showDateTime == firstSelect) ||
-      (secSelect && showDateTime == secSelect)
+      (firstSelect && showDateTime === firstSelect) ||
+      (secSelect && showDateTime === secSelect)
     ) {
       style = { ...style, ...SELECT_STYLE };
     }
@@ -131,6 +135,7 @@ function MonthView({ diff = 0, showTaskTime }) {
               noWrap
               sx={{ overflow: 'hidden', width: '100%' }}
               variant="caption"
+              onClick={handleSelectTask}
             >
               {text}
             </Typography>
@@ -140,15 +145,21 @@ function MonthView({ diff = 0, showTaskTime }) {
     );
   };
 
-  const handleMouseDown = (date) => () => {
-    if (!firstSelect || date != firstSelect) {
+  const handleSelectTask = (e) => {
+    // todo
+    navigate('/task/1');
+    e.stopPropagation();
+  };
+
+  const handleMouseDown = (date) => (e) => {
+    if (!firstSelect || date !== firstSelect) {
       setFirstSelect(date);
       setSecSelect(null);
     }
   };
 
   const handleMouseUp = (date) => () => {
-    if (!secSelect || date != secSelect) {
+    if (!secSelect || date !== secSelect) {
       if (date < firstSelect) {
         setSecSelect(firstSelect);
         setFirstSelect(date);
@@ -157,7 +168,7 @@ function MonthView({ diff = 0, showTaskTime }) {
   };
 
   const handleMouseOver = (date) => () => {
-    if (!hoverSelect || date != hoverSelect) {
+    if (!hoverSelect || date !== hoverSelect) {
       setHoverSelect(date);
     }
   };

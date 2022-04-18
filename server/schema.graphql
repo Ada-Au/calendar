@@ -98,6 +98,12 @@ type Mutation {
     """The user account password."""
     password: String!
   ): AuthPayload!
+
+  """Toggle the completeness of Todo."""
+  toggleCompleteTodo(
+    """The id of the todo."""
+    id: Int!
+  ): Todo!
   updateManyUser(data: UserUpdateManyMutationInput!, where: UserWhereInput): AffectedRowsOutput!
   updateOneTask(data: TaskUpdateInput!, where: TaskWhereUniqueInput!): Task
   updateOneTodo(data: TodoUpdateInput!, where: TodoWhereUniqueInput!): Todo

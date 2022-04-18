@@ -594,6 +594,7 @@ export interface NexusGenFieldTypes {
     deleteOneUser: NexusGenRootTypes['User'] | null; // User
     login: NexusGenRootTypes['AuthPayload']; // AuthPayload!
     signUp: NexusGenRootTypes['AuthPayload']; // AuthPayload!
+    toggleCompleteTodo: NexusGenRootTypes['Todo']; // Todo!
     updateManyUser: NexusGenRootTypes['AffectedRowsOutput']; // AffectedRowsOutput!
     updateOneTask: NexusGenRootTypes['Task'] | null; // Task
     updateOneTodo: NexusGenRootTypes['Todo'] | null; // Todo
@@ -655,6 +656,7 @@ export interface NexusGenFieldTypeNames {
     deleteOneUser: 'User'
     login: 'AuthPayload'
     signUp: 'AuthPayload'
+    toggleCompleteTodo: 'Todo'
     updateManyUser: 'AffectedRowsOutput'
     updateOneTask: 'Task'
     updateOneTodo: 'Todo'
@@ -726,6 +728,9 @@ export interface NexusGenArgTypes {
       email: string; // String!
       name: string; // String!
       password: string; // String!
+    }
+    toggleCompleteTodo: { // args
+      id: number; // Int!
     }
     updateManyUser: { // args
       data: NexusGenInputs['UserUpdateManyMutationInput']; // UserUpdateManyMutationInput!

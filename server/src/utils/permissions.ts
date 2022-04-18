@@ -24,6 +24,7 @@ export const permissions = shield(
       updateOneTask: isAuthenticated,
       createOneTodo: isAuthenticated,
       updateOneTodo: isAuthenticated,
+      toggleCompleteTodo: isAuthenticated,
       login: allow,
     },
   },

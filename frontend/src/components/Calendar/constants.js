@@ -20,8 +20,8 @@ export const MONTH_IN_YEAR = [
   'December',
 ];
 
-export const NON_WEEKDAY_STYLE = { bgcolor: 'secondary.main' };
-export const WEEKDAY_STYLE = { bgcolor: 'primary.main' };
+export const NON_WEEKDAY_STYLE = { bgcolor: 'tertiary.main' };
+export const WEEKDAY_STYLE = { bgcolor: 'secondary.main' };
 export const NON_CURRENT_MONTH_STYLE = { color: 'common.darkGrey' };
 export const CURRENT_MONTH_STYLE = { color: 'common.black' };
 
@@ -37,5 +37,5 @@ export const SELECT_STYLE = {
 
 export const TODAY_STYLE = {
   bgcolor: 'common.darkGrey',
-  color: 'common.white',
+  color: 'common.plain',
 };

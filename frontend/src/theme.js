@@ -1,12 +1,12 @@
 import { createTheme } from '@mui/material/styles';
 
 const richBlack = '#051014';
+const jet = '#2E2F2F';
 const graniteGray = '#646969';
-const glossyGrape = '#9E92AD';
-const lavenderWeb = '#E2DEE8';
-const lightGrey = '#D4D5DE';
+const lightGrey = '#CBD5D5';
 const gainsboro = '#D9E4E4';
 const cultured = '#EAF1F1';
+const lightCultured = '#F4F9F9';
 
 export default createTheme({
   palette: {
@@ -16,22 +16,27 @@ export default createTheme({
     },
     common: {
       black: `${richBlack}`,
-      darkGrey: `${graniteGray}`,
+      darkGrey: `${jet}`,
       grey: `${lightGrey}`,
       lightGrey: `${gainsboro}`,
-      white: `${cultured}`,
-      highlight: `${glossyGrape}`,
+      plain: `${cultured}`,
+      white: `${lightCultured}`,
+      highlight: `${graniteGray}`,
     },
     primary: {
+      main: `${jet}`,
+      contrastText: `${cultured}`,
+    },
+    secondary: {
       main: `${cultured}`,
       contrastText: `${richBlack}`,
     },
-    secondary: {
+    tertiary: {
       main: `${gainsboro}`,
       contrastText: `${richBlack}`,
     },
     select: {
-      main: `${glossyGrape}`,
+      main: `${graniteGray}`,
       contrastText: `${cultured}`,
     },
     highlight: {
@@ -39,7 +44,7 @@ export default createTheme({
       contrastText: `${cultured}`,
     },
     hover: {
-      main: `${lavenderWeb}`,
+      main: `${lightGrey}`,
       contrastText: `${richBlack}`,
     },
   },

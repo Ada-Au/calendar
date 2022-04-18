@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   styled,
   List,
@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
+import { gql, useQuery } from '@apollo/client';
 
 import SettingsIcon from '@mui/icons-material/Settings';
 import SearchIcon from '@mui/icons-material/Search';
@@ -18,6 +19,16 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 import DrawerItem from './DrawerItem';
+import LoadingSpinner from '../../components/LoadingSpinner';
+
+const ME = gql`
+  query Me {
+    me {
+      name
+      email
+    }
+  }
+`;
 
 const UserEmail = styled(Typography)(({ theme }) => ({
   color: theme.palette.common.darkGrey,
@@ -33,7 +44,7 @@ const ListWrapper = styled(List, {
   height: '100%',
   transition: 'left 1s',
   width: 200,
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: theme.palette.secondary.main,
 }));
 
 const Wrapper = styled(Box, { shouldForwardProp: (prop) => prop !== 'show' })(
@@ -43,14 +54,27 @@ const Wrapper = styled(Box, { shouldForwardProp: (prop) => prop !== 'show' })(
   })
 );
 
-function Drawer({ user, show, onToggle }) {
+function Drawer({ onToggle }) {
   const navigate = useNavigate();
   const [, , removeCookie] = useCookies(['token']);
+  const [show, setShow] = useState(true);
+  const { data, loading, error } = useQuery(ME);
 
   const handleLogout = () => {
     removeCookie('token', { path: '/' });
     navigate('/');
   };
+
+  const handleToggle = () => {
+    setShow((prev) => !prev);
+    onToggle();
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) {
+    console.log('error', error);
+    return;
+  }
 
   return (
     <Wrapper show={show}>
@@ -59,11 +83,11 @@ function Drawer({ user, show, onToggle }) {
           sx={{
             position: 'absolute',
             left: 192,
-            bgcolor: 'primary.main',
+            bgcolor: 'secondary.main',
             borderRadius: '0px 8px 8px 0px',
           }}
         >
-          <IconButton onClick={() => onToggle()}>
+          <IconButton onClick={() => handleToggle()}>
             {show ? (
               <KeyboardDoubleArrowLeftIcon />
             ) : (
@@ -72,8 +96,8 @@ function Drawer({ user, show, onToggle }) {
           </IconButton>
         </Box>
         <ListItem style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-          <Typography>{user.name}, Welcome back!</Typography>
-          <UserEmail variant="caption">{user.email}</UserEmail>
+          <Typography>{data.me.name}, Welcome back!</Typography>
+          <UserEmail variant="caption">{data.me.email}</UserEmail>
         </ListItem>
         <Divider />
         <DrawerItem label="Search" icon={<SearchIcon />} />

@@ -1,4 +1,6 @@
-import { objectType, extendType } from 'nexus'
+import { objectType, extendType, nonNull, intArg } from 'nexus'
+import dayjs from 'dayjs'
+import createError from 'http-errors'
 
 // Type Defs
 export const Todo = objectType({
@@ -34,5 +36,30 @@ export const TodoMutation = extendType({
   definition(t) {
     t.crud.createOneTodo()
     t.crud.updateOneTodo()
+    t.nonNull.field('toggleCompleteTodo', {
+      type: 'Todo',
+      description: 'Toggle the completeness of Todo.',
+      args: {
+        id: nonNull(intArg({ description: 'The id of the todo.' })),
+      },
+      async resolve(_root, { id }, { prisma }) {
+        let todo = await prisma.todo.findUnique({
+          where: { id },
+          select: { completed: true },
+        })
+
+        if (todo?.completed != null) {
+          return await prisma.todo.update({
+            where: { id },
+            data: {
+              completed: !todo.completed,
+              updatedAt: dayjs().toISOString(),
+            },
+          })
+        } else {
+          throw createError(401, 'Todo not exist!')
+        }
+      },
+    })
   },
 })

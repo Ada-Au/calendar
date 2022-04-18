@@ -162,7 +162,7 @@ function LoginPage() {
     } else if (!password) {
       setPwError(true);
       errorNotification('No password is set');
-    } else if (password != confirmPw) {
+    } else if (password !== confirmPw) {
       setConfirmPwError(true);
       errorNotification('Confirm password does not match');
     } else {
@@ -234,6 +234,7 @@ function LoginPage() {
             value={values.name}
             onChange={handleChange('name')}
             error={nameError}
+            required
           />
 
           <Label variant="body2">Email</Label>
@@ -244,6 +245,7 @@ function LoginPage() {
             value={values.email}
             onChange={handleChange('email')}
             error={emailError}
+            required
           />
 
           <Label variant="body2">Password</Label>
