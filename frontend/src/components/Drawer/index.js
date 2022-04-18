@@ -20,28 +20,25 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import DrawerItem from './DrawerItem';
 
 const UserEmail = styled(Typography)(({ theme }) => ({
-  color: theme.palette.common.grey,
+  color: theme.palette.common.darkGrey,
 }));
 
 const ListWrapper = styled(List, {
   shouldForwardProp: (prop) => prop !== 'show',
-})(({ show }) => ({
+})(({ theme, show }) => ({
   position: 'absolute',
   left: show ? 0 : -200,
-  // backgroundColor: theme.palette.background.main,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
   transition: 'left 1s',
   width: 200,
+  backgroundColor: theme.palette.primary.main,
 }));
 
 const Wrapper = styled(Box, { shouldForwardProp: (prop) => prop !== 'show' })(
-  ({ theme, show }) => ({
+  ({ show }) => ({
     width: show ? 200 : 0,
-    backgroundColor: theme.palette.background.main,
-    // display: 'flex',
-    // flexDirection: 'column',
     transition: 'width 1s',
   })
 );
@@ -61,8 +58,8 @@ function Drawer({ user, show, onToggle }) {
         <Box
           sx={{
             position: 'absolute',
-            left: 190,
-            bgcolor: 'background.main',
+            left: 192,
+            bgcolor: 'primary.main',
             borderRadius: '0px 8px 8px 0px',
           }}
         >
@@ -74,13 +71,11 @@ function Drawer({ user, show, onToggle }) {
             )}
           </IconButton>
         </Box>
-        <ListItem
-          dense
-          style={{ flexDirection: 'column', alignItems: 'flex-start' }}
-        >
-          <Typography>Welcome back {user.name}!</Typography>
+        <ListItem style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+          <Typography>{user.name}, Welcome back!</Typography>
           <UserEmail variant="caption">{user.email}</UserEmail>
         </ListItem>
+        <Divider />
         <DrawerItem label="Search" icon={<SearchIcon />} />
         <Divider />
         <ListItem>

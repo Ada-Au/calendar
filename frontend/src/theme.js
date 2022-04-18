@@ -1,30 +1,46 @@
 import { createTheme } from '@mui/material/styles';
 
-const spaceCadet = '#22223b';
-const independence = '#4a4e69';
-const heliotropeGray = '#9a8c98';
-const silverPink = '#c9ada7';
-const Isabelline = '#f2e9e4';
+const richBlack = '#051014';
+const graniteGray = '#646969';
+const glossyGrape = '#9E92AD';
+const lavenderWeb = '#E2DEE8';
+const lightGrey = '#D4D5DE';
+const gainsboro = '#D9E4E4';
+const cultured = '#EAF1F1';
 
 export default createTheme({
   palette: {
     text: {
-      primary: `${spaceCadet}`,
-      secondary: `${independence}`,
+      primary: `${richBlack}`,
+      secondary: `${graniteGray}`,
     },
     common: {
-      grey: `${heliotropeGray}`,
+      black: `${richBlack}`,
+      darkGrey: `${graniteGray}`,
+      grey: `${lightGrey}`,
+      lightGrey: `${gainsboro}`,
+      white: `${cultured}`,
+      highlight: `${glossyGrape}`,
     },
     primary: {
-      main: `${independence}`,
-      contrastText: `${Isabelline}`,
+      main: `${cultured}`,
+      contrastText: `${richBlack}`,
     },
     secondary: {
-      main: `${silverPink}`,
+      main: `${gainsboro}`,
+      contrastText: `${richBlack}`,
     },
-    background: {
-      main: `${Isabelline}`,
-      contrastText: `${spaceCadet}`,
+    select: {
+      main: `${glossyGrape}`,
+      contrastText: `${cultured}`,
+    },
+    highlight: {
+      main: `${richBlack}`,
+      contrastText: `${cultured}`,
+    },
+    hover: {
+      main: `${lavenderWeb}`,
+      contrastText: `${richBlack}`,
     },
   },
 });

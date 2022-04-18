@@ -12,7 +12,7 @@ const SpinnerContainer = styled('div')(() => ({
 const Spinner = styled('span')(({ theme }) => ({
   width: '50px',
   height: '50px',
-  border: `10px solid ${theme.palette.background.main}`,
+  border: `10px solid ${theme.palette.primary.main}`,
   borderTop: `10px solid ${theme.palette.secondary.main}`,
   borderRadius: '50%',
   animation: 'spinner 1.5s linear infinite',

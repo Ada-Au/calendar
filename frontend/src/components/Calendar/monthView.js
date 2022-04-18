@@ -9,14 +9,26 @@ import {
 } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import {
+  DAY_IN_WEEK,
+  DAY_IN_WEEK_STYLE,
+  NON_WEEKDAY_STYLE,
+  WEEKDAY_STYLE,
+  NON_CURRENT_MONTH_STYLE,
+  CURRENT_MONTH_STYLE,
+  MONTH_IN_YEAR,
+  HOVER_STYLE,
+  SELECT_STYLE,
+  TODAY_STYLE,
+} from './constants';
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
   padding: '8px',
   color: theme.palette.text.secondary,
   userSelect: 'none',
   flex: 1,
+  borderRadius: '2px',
 }));
 
 const ItemWrapper = styled(Grid)(() => ({
@@ -24,31 +36,81 @@ const ItemWrapper = styled(Grid)(() => ({
   flexDirection: 'column',
 }));
 
-function MonthView({ diff = 0 }) {
+const TextWrapper = styled('div')(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+}));
+
+// todo: show task time when hide drawer
+function MonthView({ diff = 0, showTaskTime }) {
+  const [firstSelect, setFirstSelect] = useState();
+  const [hoverSelect, setHoverSelect] = useState();
+  const [secSelect, setSecSelect] = useState();
   const [monthDiff, setMonthDiff] = useState(diff);
 
-  const DAY_IN_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + monthDiff;
+  const viewingDate = new Date(year, month + 1, 0);
 
-  const detailedDate = new Date();
-  const year = detailedDate.getFullYear();
-  const month = detailedDate.getMonth() + 1 + monthDiff;
-
-  let dayBeforeMonth = new Date(year, month - 1, 0).getDay();
-  if (dayBeforeMonth < 0) dayBeforeMonth += 7;
+  let dayBeforeMonth = new Date(year, month, 0).getDay() + 1; // +1 to start at sun
+  if (dayBeforeMonth >= 7) dayBeforeMonth -= 7;
 
   // Default show 35 days, some months have included more that 5 weeks
   let showingDays =
-    35 - dayBeforeMonth - new Date(year, month, 0).getDate() < 0 ? 42 : 35;
+    35 - dayBeforeMonth - new Date(year, month + 1, 0).getDate() < 0 ? 42 : 35;
 
-  const renderItem = (index, day) => {
-    const showDate = new Date(year, month - 1, 1 + day - dayBeforeMonth);
-    // month - showDate.getMonth(): 2 for before, 1 for current, 0 for after
-    const style =
-      month - showDate.getMonth() == 2
-        ? { bgcolor: '#aff' }
-        : month - showDate.getMonth() == 1
-        ? {}
-        : { bgcolor: '#afa' };
+  const renderItem = (index) => {
+    const showDate = new Date(year, month, 1 + index - dayBeforeMonth);
+    const showDateTime = showDate.getTime();
+    const monthDiff = showDate.getMonth() - month;
+
+    let style = {};
+    if (
+      monthDiff == -1 ||
+      monthDiff == 11 || // 11 for before Jan (12 - 1)
+      monthDiff == 1 ||
+      monthDiff == 13 // 13 for after Dec (12 - -1)
+    )
+      style = NON_CURRENT_MONTH_STYLE;
+    else style = CURRENT_MONTH_STYLE;
+
+    if (showDate.getDay() == 6 || showDate.getDay() == 0)
+      style = { ...style, ...NON_WEEKDAY_STYLE };
+    else style = { ...style, ...WEEKDAY_STYLE };
+
+    if (
+      showDate.getFullYear() == year &&
+      showDate.getMonth() == month &&
+      showDate.getDate() == today.getDate()
+    )
+      style = { ...style, ...TODAY_STYLE };
+
+    if (firstSelect && hoverSelect)
+      if (!secSelect) {
+        if (firstSelect > hoverSelect) {
+          if (showDateTime >= hoverSelect && showDateTime < firstSelect)
+            style = { ...style, ...HOVER_STYLE };
+        } else {
+          if (showDateTime <= hoverSelect && showDateTime > firstSelect)
+            style = { ...style, ...HOVER_STYLE };
+        }
+      } else {
+        if (showDateTime > firstSelect && showDateTime < secSelect)
+          style = { ...style, ...HOVER_STYLE };
+      }
+
+    if (hoverSelect == showDateTime) {
+      style = { ...style, ...HOVER_STYLE };
+    }
+
+    if (
+      (firstSelect && showDateTime == firstSelect) ||
+      (secSelect && showDateTime == secSelect)
+    ) {
+      style = { ...style, ...SELECT_STYLE };
+    }
 
     // todo: get task
     const text =
@@ -58,23 +120,12 @@ function MonthView({ diff = 0 }) {
         item
         xs={1}
         key={index}
-        onMouseDown={handleMouseAction(
-          true,
-          new Date(year, month, index - dayBeforeMonth + 1)
-        )}
-        onMouseUp={handleMouseAction(
-          false,
-          new Date(year, month, index - dayBeforeMonth + 1)
-        )}
+        onMouseDown={handleMouseDown(showDate.getTime())}
+        onMouseUp={handleMouseUp(showDate.getTime())}
+        onMouseOver={handleMouseOver(showDate.getTime())}
       >
         <Item id={index} sx={style}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-            }}
-          >
+          <TextWrapper>
             {showDate.getDate()}
             <Typography
               noWrap
@@ -83,15 +134,32 @@ function MonthView({ diff = 0 }) {
             >
               {text}
             </Typography>
-          </div>
+          </TextWrapper>
         </Item>
       </ItemWrapper>
     );
   };
 
-  const handleMouseAction = (status, date) => () => {
-    if (status) console.log('mouseDown', date.toLocaleString());
-    else console.log('mouseUp', date.toLocaleString());
+  const handleMouseDown = (date) => () => {
+    if (!firstSelect || date != firstSelect) {
+      setFirstSelect(date);
+      setSecSelect(null);
+    }
+  };
+
+  const handleMouseUp = (date) => () => {
+    if (!secSelect || date != secSelect) {
+      if (date < firstSelect) {
+        setSecSelect(firstSelect);
+        setFirstSelect(date);
+      } else setSecSelect(date);
+    }
+  };
+
+  const handleMouseOver = (date) => () => {
+    if (!hoverSelect || date != hoverSelect) {
+      setHoverSelect(date);
+    }
   };
 
   const handleChangeMonth = (change) => {
@@ -100,21 +168,25 @@ function MonthView({ diff = 0 }) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', p: 2, flex: 1 }}>
-      <Grid container columns={{ xs: 12 }} sx={{ pb: 2 }}>
+      <Grid
+        container
+        columns={{ xs: 12 }}
+        sx={{ pb: 2, alignItems: 'center', justifyContent: 'flex-end' }}
+      >
         <IconButton onClick={() => handleChangeMonth(-1)}>
           <ArrowBackIosNewIcon />
         </IconButton>
-        <Typography>
-          {year} {month}
+        <Typography onClick={() => console.log('todo: add year view')}>
+          {viewingDate.getFullYear()} {MONTH_IN_YEAR[viewingDate.getMonth()]}
         </Typography>
         <IconButton onClick={() => handleChangeMonth(1)}>
           <ArrowForwardIosIcon />
         </IconButton>
       </Grid>
       <Grid container columns={{ xs: 7 }} sx={{ pb: 2 }}>
-        {DAY_IN_WEEK.map((day, index) => (
-          <Grid item xs={1} key={index}>
-            <Item sx={{ bgcolor: '#ff0' }}>{day}</Item>
+        {DAY_IN_WEEK.map((day) => (
+          <Grid item xs={1} key={day}>
+            <Item sx={DAY_IN_WEEK_STYLE}>{day}</Item>
           </Grid>
         ))}
       </Grid>
@@ -123,9 +195,7 @@ function MonthView({ diff = 0 }) {
         columns={{ xs: 7 }}
         sx={{ height: '100%', gridAutoFlow: 'column' }}
       >
-        {Array.from(Array(showingDays)).map((_, index) =>
-          renderItem(index, index)
-        )}
+        {Array.from(Array(showingDays)).map((_, index) => renderItem(index))}
       </Grid>
     </Box>
   );
