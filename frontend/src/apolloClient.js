@@ -5,7 +5,7 @@ import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
 
 const backendHost = 'http://localhost:4001/graphql';
-const loginPage = 'http://localhost:3000/login';
+const loginPage = 'http://localhost:3000/';
 
 const cookies = new Cookies();
 
@@ -33,7 +33,8 @@ const errorLink = onError(({ response, graphQLErrors }) => {
         responseErr.includes('Not Authorised'))) ||
     (gqlError && gqlError.includes('Token Missing'))
   ) {
-    cookies.remove('token', { path: '/login' });
+    cookies.remove('token', { path: '/' });
+    alert('token expired!');
     localStorage.clear();
     window.location.href = loginPage;
   }

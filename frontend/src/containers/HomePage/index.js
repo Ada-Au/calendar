@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Box } from '@mui/material';
+import { styled, Box, Typography } from '@mui/material';
 import 'react-calendar/dist/Calendar.css';
 
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -17,31 +17,36 @@ const ME = gql`
   }
 `;
 
+const Wrapper = styled(Box)(() => ({
+  padding: '0px 32px',
+  flex: '1',
+  display: 'flex',
+  flexDirection: 'column',
+  overflowY: 'scroll',
+}));
+
 function HomePage() {
   const { data, loading, error } = useQuery(ME);
+  const [showDrawer, setShowDrawer] = useState(true);
 
-  const onChange = (e) => {
-    console.log('onChange', e);
+  const handleToggle = () => {
+    setShowDrawer((prev) => !prev);
   };
   if (loading) return <LoadingSpinner />;
-  if (error) console.log('error', error);
-  console.log(data);
+  if (error) {
+    console.log('error', error);
+    return <LoadingSpinner />;
+  }
   const { name, email } = data.me;
   return (
     <Box>
       <Box height="100vh" display="flex" flexDirection="row">
-        <Drawer />
-        <Box flex="1" sx={{ px: 8, display: 'flex', flexDirection: 'column' }}>
+        <Drawer user={data.me} show={showDrawer} onToggle={handleToggle} />
+        <Wrapper>
           {/* <CustomCalendar /> */}
+          <Typography>Welcome back {name}!</Typography>
           <Calendar />
-          <header className="App-header">
-            <p>
-              Edit <code>src/App.js</code> and save to reload.
-              {name}
-              {email}
-            </p>
-          </header>
-        </Box>
+        </Wrapper>
       </Box>
     </Box>
   );

@@ -10,11 +10,11 @@ export default createTheme({
   palette: {
     text: {
       primary: `${spaceCadet}`,
+      secondary: `${independence}`,
     },
-    // common: {
-    //   blue: `${arcBlue}`,
-    //   orange: `${arcOrange}`,
-    // },
+    common: {
+      grey: `${heliotropeGray}`,
+    },
     primary: {
       main: `${independence}`,
       contrastText: `${Isabelline}`,

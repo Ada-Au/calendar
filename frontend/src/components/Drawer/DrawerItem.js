@@ -4,14 +4,15 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Typography,
 } from '@mui/material';
 
 function DrawerItem({ label, icon, onClick }) {
   return (
-    <ListItem>
+    <ListItem dense>
       <ListItemButton onClick={onClick}>
         <ListItemIcon>{icon}</ListItemIcon>
-        <ListItemText primary={label} />
+        <ListItemText primary={<Typography>{label}</Typography>} />
       </ListItemButton>
     </ListItem>
   );

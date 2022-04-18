@@ -1,52 +1,117 @@
-import React from 'react';
-import { styled, Grid, Paper, Box } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import {
+  styled,
+  Grid,
+  Paper,
+  Box,
+  Typography,
+  IconButton,
+} from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
-  padding: theme.spacing(2),
-  textAlign: 'center',
+  padding: '8px',
   color: theme.palette.text.secondary,
+  userSelect: 'none',
   flex: 1,
 }));
 
-const ItemWrapper = styled(Grid)(({ theme }) => ({
+const ItemWrapper = styled(Grid)(() => ({
   display: 'flex',
+  flexDirection: 'column',
 }));
 
-function MonthView() {
+function MonthView({ diff = 0 }) {
+  const [monthDiff, setMonthDiff] = useState(diff);
+
   const DAY_IN_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-  const date = new Date();
-  const viewMonthDiff = 1;
+  const detailedDate = new Date();
+  const year = detailedDate.getFullYear();
+  const month = detailedDate.getMonth() + 1 + monthDiff;
 
-  const firstDay = new Date(
-    date.getFullYear(),
-    date.getMonth() + viewMonthDiff,
-    1
-  );
-
-  const lastMonthDayNum = new Date(
-    date.getFullYear(),
-    date.getMonth() + viewMonthDiff,
-    0
-  ).getDate();
-  const currentMonthDayNum = new Date(
-    date.getFullYear(),
-    date.getMonth() + 1 + viewMonthDiff,
-    0
-  ).getDate();
-
-  // Monday = 1, -1 to start from Sunday
-  let dayBeforeMonth = firstDay.getDay() - 1;
+  let dayBeforeMonth = new Date(year, month - 1, 0).getDay();
   if (dayBeforeMonth < 0) dayBeforeMonth += 7;
 
-  let dayAfterMonth = 35 - dayBeforeMonth - currentMonthDayNum;
-  if (dayAfterMonth < 0) dayAfterMonth += 7;
+  // Default show 35 days, some months have included more that 5 weeks
+  let showingDays =
+    35 - dayBeforeMonth - new Date(year, month, 0).getDate() < 0 ? 42 : 35;
+
+  const renderItem = (index, day) => {
+    const showDate = new Date(year, month - 1, 1 + day - dayBeforeMonth);
+    // month - showDate.getMonth(): 2 for before, 1 for current, 0 for after
+    const style =
+      month - showDate.getMonth() == 2
+        ? { bgcolor: '#aff' }
+        : month - showDate.getMonth() == 1
+        ? {}
+        : { bgcolor: '#afa' };
+
+    // todo: get task
+    const text =
+      'test bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+    return (
+      <ItemWrapper
+        item
+        xs={1}
+        key={index}
+        onMouseDown={handleMouseAction(
+          true,
+          new Date(year, month, index - dayBeforeMonth + 1)
+        )}
+        onMouseUp={handleMouseAction(
+          false,
+          new Date(year, month, index - dayBeforeMonth + 1)
+        )}
+      >
+        <Item id={index} sx={style}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            {showDate.getDate()}
+            <Typography
+              noWrap
+              sx={{ overflow: 'hidden', width: '100%' }}
+              variant="caption"
+            >
+              {text}
+            </Typography>
+          </div>
+        </Item>
+      </ItemWrapper>
+    );
+  };
+
+  const handleMouseAction = (status, date) => () => {
+    if (status) console.log('mouseDown', date.toLocaleString());
+    else console.log('mouseUp', date.toLocaleString());
+  };
+
+  const handleChangeMonth = (change) => {
+    setMonthDiff((prev) => prev + change);
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', p: 2, flex: 1 }}>
-      <Grid container spacing={{ xs: 1 }} columns={{ xs: 7 }} sx={{ pb: 2 }}>
+      <Grid container columns={{ xs: 12 }} sx={{ pb: 2 }}>
+        <IconButton onClick={() => handleChangeMonth(-1)}>
+          <ArrowBackIosNewIcon />
+        </IconButton>
+        <Typography>
+          {year} {month}
+        </Typography>
+        <IconButton onClick={() => handleChangeMonth(1)}>
+          <ArrowForwardIosIcon />
+        </IconButton>
+      </Grid>
+      <Grid container columns={{ xs: 7 }} sx={{ pb: 2 }}>
         {DAY_IN_WEEK.map((day, index) => (
           <Grid item xs={1} key={index}>
             <Item sx={{ bgcolor: '#ff0' }}>{day}</Item>
@@ -55,27 +120,12 @@ function MonthView() {
       </Grid>
       <Grid
         container
-        spacing={{ xs: 1 }}
         columns={{ xs: 7 }}
         sx={{ height: '100%', gridAutoFlow: 'column' }}
       >
-        {Array.from(Array(dayBeforeMonth)).map((_, index) => (
-          <ItemWrapper item xs={1} key={index}>
-            <Item sx={{ bgcolor: '#0ff' }}>
-              {lastMonthDayNum - dayBeforeMonth + index + 1}
-            </Item>
-          </ItemWrapper>
-        ))}
-        {Array.from(Array(currentMonthDayNum)).map((_, index) => (
-          <ItemWrapper item xs={1} key={index}>
-            <Item>{index + 1}</Item>
-          </ItemWrapper>
-        ))}
-        {Array.from(Array(dayAfterMonth)).map((_, index) => (
-          <ItemWrapper item xs={1} key={index}>
-            <Item sx={{ bgcolor: '#0f0' }}>{index + 1}</Item>
-          </ItemWrapper>
-        ))}
+        {Array.from(Array(showingDays)).map((_, index) =>
+          renderItem(index, index)
+        )}
       </Grid>
     </Box>
   );

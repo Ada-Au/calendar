@@ -55,7 +55,7 @@ const Wrapper = styled(Paper)(() => ({
   display: 'flex',
   flexDirection: 'column',
   padding: '64px',
-  width: '360px',
+  width: '450px',
 }));
 
 const LinkBtn = styled(Link)(() => ({
@@ -92,8 +92,11 @@ function LoginPage() {
     onCompleted: (data) => {
       if (data?.login) {
         const { token } = data.login;
-        setCookie('token', token, { path: '/' });
-        navigate('/');
+        setCookie('token', token, {
+          path: '/',
+          maxAge: 60 * 60 * 24, // Will expire after 1 day
+        });
+        navigate('/home');
       }
     },
   });
@@ -195,8 +198,10 @@ function LoginPage() {
 
           <Label variant="body2">Email</Label>
           <TextField
+            size="small"
             variant="outlined"
             type="email"
+            value={values.email}
             onChange={handleChange('email')}
             error={emailError}
           />
@@ -224,15 +229,19 @@ function LoginPage() {
 
           <Label variant="body2">Name</Label>
           <TextField
+            size="small"
             variant="outlined"
+            value={values.name}
             onChange={handleChange('name')}
             error={nameError}
           />
 
           <Label variant="body2">Email</Label>
           <TextField
+            size="small"
             variant="outlined"
             type="email"
+            value={values.email}
             onChange={handleChange('email')}
             error={emailError}
           />

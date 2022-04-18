@@ -5,6 +5,7 @@ import { createBrowserHistory } from 'history';
 import { ThemeProvider } from '@mui/material/styles';
 import { NotificationContainer } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import client from './apolloClient';
 import theme from './theme';
@@ -18,12 +19,13 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         {/* <LanguageProvider messages={messages}> */}
         <BrowserRouter history={history}>
           <NotificationContainer />
           <Routes>
-            <Route exact path="/" element={<HomePage />} />
-            <Route exact path="/login" element={<LoginPage />} />
+            <Route exact path="/home" element={<HomePage />} />
+            <Route exact path="/" element={<LoginPage />} />
           </Routes>
         </BrowserRouter>
         {/* </LanguageProvider> */}

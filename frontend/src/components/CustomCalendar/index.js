@@ -6,7 +6,7 @@ function CustomCalendar() {
   const onChange = (e) => {
     console.log('onChange', e);
   };
-  return <Calendar onChange={onChange} />;
+  return <Calendar onChange={onChange} selectRange />;
 }
 
 export default CustomCalendar;
