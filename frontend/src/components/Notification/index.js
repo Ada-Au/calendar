@@ -6,5 +6,5 @@ export const errorNotification = (errorMsg) => {
 };
 
 export const successNotification = (msg) => {
-  NotificationManager.success('Success!', msg, 1000);
+  NotificationManager.success(msg, 'Success!', 1000);
 };

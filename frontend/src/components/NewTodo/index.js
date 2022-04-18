@@ -19,19 +19,16 @@ const CREATE_ONE_TODO = gql`
 function NewTodo({ taskId, onToggle }) {
   const [todoData, setTodoData] = useState({});
   const [titleError, setTitleError] = useState(false);
-  const [createOneTodo, { loading: loginLoading }] = useMutation(
-    CREATE_ONE_TODO,
-    {
-      onError: (error) => {
-        errorNotification(error.message);
-      },
-      onCompleted: () => {
-        setTodoData({});
-        onToggle();
-        successNotification('Todo created!');
-      },
-    }
-  );
+  const [createOneTodo, { loading }] = useMutation(CREATE_ONE_TODO, {
+    onError: (error) => {
+      errorNotification(error.message);
+    },
+    onCompleted: () => {
+      setTodoData({});
+      onToggle();
+      successNotification('Todo created');
+    },
+  });
 
   const handleChange = (prop) => (event) => {
     if (prop === 'title' && titleError) {
@@ -56,16 +53,14 @@ function NewTodo({ taskId, onToggle }) {
     <Paper sx={{ p: 2, flexDirection: 'column', display: 'flex' }}>
       <Box sx={{ display: 'flex', flexDirection: 'row', pb: 1 }}>
         <TextField
-          sx={{ maxWidth: 300 }}
+          sx={{ width: 300 }}
           label="Title"
-          color="highlight"
           size="small"
           required
           onChange={handleChange('title')}
           error={titleError}
         />
-        <div style={{ flex: 1 }} />
-        <IconButton onClick={onToggle}>
+        <IconButton onClick={onToggle} sx={{ ml: 'auto' }}>
           <CloseIcon />
         </IconButton>
         <IconButton onClick={handleSubmit}>
@@ -74,7 +69,6 @@ function NewTodo({ taskId, onToggle }) {
       </Box>
       <TextField
         label="Description"
-        color="highlight"
         size="small"
         multiline
         onChange={handleChange('description')}

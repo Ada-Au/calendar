@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import {
   styled,
   Box,
@@ -8,16 +8,24 @@ import {
   Checkbox,
   FormControlLabel,
   IconButton,
+  TextField,
 } from '@mui/material';
+import DateTimePicker from '@mui/lab/DateTimePicker';
 import { useParams } from 'react-router-dom';
 import 'react-calendar/dist/Calendar.css';
 
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done';
 
 import Drawer from '../../components/Drawer';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import NewTodo from '../../components/NewTodo';
 import TodoItem from '../../components/TodoItem';
+import {
+  errorNotification,
+  successNotification,
+} from '../../components/Notification';
 
 const TASK = gql`
   query Task($id: Int!) {
@@ -31,6 +39,29 @@ const TASK = gql`
       todos {
         id
       }
+    }
+  }
+`;
+
+const TOGGLE_COMPLETE_TASK = gql`
+  mutation ToggleCompleteTask($id: Int!) {
+    toggleCompleteTask(id: $id) {
+      id
+      title
+      completed
+    }
+  }
+`;
+
+const UPDATE_ONE_TASK = gql`
+  mutation UpdateOneTask(
+    $data: TaskUpdateInput!
+    $where: TaskWhereUniqueInput!
+  ) {
+    updateOneTask(data: $data, where: $where) {
+      id
+      title
+      completed
     }
   }
 `;
@@ -54,10 +85,29 @@ const Wrapper = styled(Box)(({ theme }) => ({
 
 function TaskPage() {
   const [isCreate, setIsCreate] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [endTimeError, setEndTimeError] = useState(false);
+  const [titleError, setTitleError] = useState(false);
+  const [taskData, setTaskData] = useState({});
+  const [deleteItems, setDeleteItems] = useState([]);
+
   const { id } = useParams();
   const { data, loading, error, refetch } = useQuery(TASK, {
     variables: { id: +id },
   });
+  const [updateOneTask, { loading: updateLoading }] = useMutation(
+    UPDATE_ONE_TASK,
+    {
+      onError: (error) => {
+        errorNotification(error.message);
+      },
+      onCompleted: () => {
+        refetch();
+        setIsEdit(false);
+        successNotification('Task updated');
+      },
+    }
+  );
 
   const fullOptions = {
     year: 'numeric',
@@ -79,6 +129,104 @@ function TaskPage() {
     refetch();
   };
 
+  const handleEdit = (task) => () => {
+    const { title, description, startTime, endTime, isFullDay } = task;
+    if (!isEdit) setIsCreate(false);
+    if (Object.keys(taskData).length === 0)
+      setTaskData({
+        title,
+        description,
+        startTime,
+        endTime,
+        isFullDay,
+      });
+
+    setIsEdit((prev) => !prev);
+    setDeleteItems([]);
+  };
+
+  const handleToggleDelete = (id) => {
+    if (deleteItems.includes(id))
+      setDeleteItems(deleteItems.filter((itemId) => itemId !== id));
+    else setDeleteItems([...deleteItems, id]);
+  };
+
+  const handleSubmit = () => {
+    if (!taskData.title) {
+      setTitleError(true);
+      errorNotification('No title is set');
+    } else if (!isFullDay && !taskData.endTime) {
+      setEndTimeError(true);
+      errorNotification('No end time is set');
+    } else {
+      const deleteTodos = deleteItems.reduce(
+        (list, item) => [...list, { id: item }],
+        []
+      );
+      updateOneTask({
+        variables: {
+          data: {
+            ...taskData,
+            isFullDay: { set: taskData.isFullDay },
+            startTime: { set: taskData.startTime },
+            endTime: taskData.endTime ? { set: taskData.endTime } : null,
+            title: { set: taskData.title },
+            description: { set: taskData.description },
+            todos: { delete: deleteTodos },
+          },
+          where: { id: +id },
+        },
+      });
+    }
+  };
+
+  const handleChange = (prop) => (event) => {
+    if (prop === 'title' && titleError) {
+      setTitleError(false);
+    }
+    setTaskData({ ...taskData, [prop]: event.target.value });
+  };
+
+  const handleChangeIsFullDay = (event) => {
+    setTaskData({ ...taskData, isFullDay: event.target.checked });
+  };
+
+  const handleChangeStartTime = (time) => {
+    setTaskData({ ...taskData, startTime: new Date(time).toISOString() });
+  };
+
+  const handleChangeEndTime = (time) => {
+    setTaskData({ ...taskData, endTime: new Date(time).toISOString() });
+    setEndTimeError(false);
+  };
+
+  const formatDate = (dateVal) => {
+    var newDate = new Date(dateVal);
+
+    var sMonth = padValue(newDate.getMonth() + 1);
+    var sDay = padValue(newDate.getDate());
+    var sYear = newDate.getFullYear();
+    var sHour = newDate.getHours();
+    var sMinute = padValue(newDate.getMinutes());
+    var iHourCheck = parseInt(sHour);
+    var sAMPM = 'am';
+
+    if (iHourCheck > 12) {
+      sAMPM = 'pm';
+      sHour = iHourCheck - 12;
+    } else if (iHourCheck === 0) {
+      sHour = '12';
+    }
+
+    sHour = padValue(sHour);
+
+    return `${sMonth}/${sDay}/${sYear} ${sHour}:${sMinute} ${sAMPM}`;
+  };
+
+  function padValue(value) {
+    return value < 10 ? '0' + value : value;
+  }
+
   if (loading) return <LoadingSpinner />;
   if (error) {
     console.log('error', error);
@@ -95,28 +243,97 @@ function TaskPage() {
     isFullDay,
     todos,
   } = data.task;
+
   return (
     <Box>
       <Wrapper>
         <Drawer />
         <ContentWrapper>
-          <Typography variant="h3" sx={{ pt: 8, pb: 1 }}>
-            {title}
-          </Typography>
-          {description && (
-            <Typography variant="body1" sx={{ pb: 1 }}>
-              {description}
-            </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 8, pb: 1 }}>
+            {isEdit ? (
+              <TextField
+                sx={{ width: 420 }}
+                inputProps={{ style: { fontSize: 40 } }}
+                variant="standard"
+                required
+                value={taskData.title}
+                onChange={handleChange('title')}
+                error={titleError}
+              />
+            ) : (
+              <Typography variant="h3">{title}</Typography>
+            )}
+            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'flex-end' }}>
+              {isEdit && (
+                <IconButton onClick={handleSubmit}>
+                  <DoneIcon />
+                </IconButton>
+              )}
+              <IconButton onClick={handleEdit(data.task)}>
+                <EditIcon sx={isEdit ? { color: 'highlight.main' } : {}} />
+              </IconButton>
+              <FormControlLabel
+                sx={{ pl: 1 }}
+                label="Complete"
+                control={
+                  <Checkbox
+                    value={completed}
+                    onChange={() => {
+                      console.log('todo: update');
+                    }}
+                  />
+                }
+              />
+            </Box>
+          </Box>
+          {isEdit ? (
+            <TextField
+              label="Description"
+              size="small"
+              multiline
+              onChange={handleChange('description')}
+              sx={{ pb: 1 }}
+            />
+          ) : (
+            description && (
+              <Typography variant="body1" sx={{ pb: 1 }}>
+                {description}
+              </Typography>
+            )
           )}
           <Divider />
-          <Box sx={{ pt: 2.5, pb: 1 }}>
-            {isFullDay ? (
-              <></>
+          <Box
+            sx={{ pt: 2.5, pb: 1, display: 'flex', flexDirection: 'column' }}
+          >
+            {isEdit ? (
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                <Box flex={1}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} fullWidth />}
+                    label="Start Time"
+                    value={formatDate(taskData.startTime)}
+                    onChange={handleChangeStartTime}
+                  />
+                </Box>
+                {!taskData?.isFullDay && (
+                  <Box flex={1}>
+                    <DateTimePicker
+                      renderInput={(props) => (
+                        <TextField {...props} fullWidth error={endTimeError} />
+                      )}
+                      label="End Time"
+                      value={taskData.endTime}
+                      onChange={handleChangeEndTime}
+                    />
+                  </Box>
+                )}
+              </Box>
             ) : (
               <Typography variant="body1">
-                {new Date(startTime).toLocaleString('en-GB', fullOptions)}{' '}
-                {endTime
-                  ? ` to ${new Date(endTime).toLocaleString(
+                {new Date(startTime).toLocaleString('en-GB', fullOptions)}
+                {isFullDay
+                  ? ''
+                  : ` to ${new Date(endTime).toLocaleString(
                       'en-GB',
                       new Date(startTime).getFullYear() ===
                         new Date(endTime).getFullYear() &&
@@ -126,49 +343,39 @@ function TaskPage() {
                           new Date(endTime).getDate()
                         ? TimeOnlyOptions
                         : fullOptions
-                    )}`
-                  : ''}
+                    )}`}
               </Typography>
             )}
-
             <FormControlLabel
-              label="Complete"
-              control={
-                <Checkbox
-                  value={completed}
-                  onChange={() => {
-                    console.log('todo: update');
-                  }}
-                  color="highlight"
-                />
-              }
-            />
-            <FormControlLabel
-              sx={{ pl: 2 }}
               label="isFullDay"
               control={
                 <Checkbox
-                  value={completed}
-                  onChange={() => {
-                    console.log('todo: update');
-                  }}
-                  color="highlight"
+                  checked={isEdit ? taskData?.isFullDay : isFullDay}
+                  disabled={!isEdit}
+                  onChange={handleChangeIsFullDay}
                 />
               }
             />
           </Box>
           <Divider />
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <IconButton onClick={handleCreateTodo} disabled={isCreate}>
+            <IconButton
+              onClick={handleCreateTodo}
+              disabled={isCreate || isEdit}
+            >
               <AddIcon />
             </IconButton>
           </Box>
 
           {isCreate && <NewTodo taskId={id} onToggle={handleCreateTodo} />}
           {todos.map((todo) => (
-            <TodoItem id={todo.id} />
+            <TodoItem
+              id={todo.id}
+              isEdit={isEdit}
+              isDelete={deleteItems.includes(todo.id)}
+              onToggleDelete={handleToggleDelete}
+            />
           ))}
-          {/* todo: map todo */}
         </ContentWrapper>
       </Wrapper>
     </Box>

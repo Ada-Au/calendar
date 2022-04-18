@@ -11,6 +11,7 @@ import 'react-calendar/dist/Calendar.css';
 import { gql, useMutation, useQuery } from '@apollo/client';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import LoadingSpinner from '../LoadingSpinner';
 
 const TOGGLE_COMPLETE_TODO = gql`
@@ -26,7 +27,6 @@ const TOGGLE_COMPLETE_TODO = gql`
 const TODO = gql`
   query Todo($where: TodoWhereUniqueInput!) {
     todo(where: $where) {
-      id
       title
       description
       completed
@@ -40,7 +40,7 @@ const Wrapper = styled('div')(() => ({
   alignItems: 'center',
 }));
 
-function TodoItem({ id }) {
+function TodoItem({ id, isEdit, isDelete, onToggleDelete }) {
   const [open, setOpen] = useState(false);
   const { data, loading, error } = useQuery(TODO, {
     variables: { where: { id } },
@@ -52,35 +52,45 @@ function TodoItem({ id }) {
     toggleCompleteTodo({ variables: { id } });
   };
 
+  const handleToggleDelete = () => {
+    onToggleDelete(id);
+  };
+
   if (loading) return <LoadingSpinner />;
   if (error) {
     console.log('error', error);
     // todo: error page
     return;
   }
-  const todo = data.todo;
+  const { title, description, completed } = data.todo;
+
   return (
     <Paper sx={{ p: 1, my: 1 }}>
       <Wrapper>
-        <Checkbox
-          checked={todo.completed}
-          onChange={handleToggleComplete}
-          color="highlight"
-        />
-        <Typography>{todo.title}</Typography>
-        {todo.description && (
-          <>
-            <div style={{ flex: 1 }} />
-            <IconButton onClick={() => setOpen((prev) => !prev)}>
-              <ExpandMoreIcon />
-            </IconButton>
-          </>
+        {isEdit ? (
+          <Checkbox
+            indeterminate={isDelete}
+            onChange={handleToggleDelete}
+            color="highlight"
+            sx={{ color: 'highlight.main' }}
+          />
+        ) : (
+          <Checkbox checked={completed} onChange={handleToggleComplete} />
+        )}
+        <Typography>{title}</Typography>
+        {description && (
+          <IconButton
+            onClick={() => setOpen((prev) => !prev)}
+            sx={{ ml: 'auto' }}
+          >
+            <ExpandMoreIcon />
+          </IconButton>
         )}
       </Wrapper>
-      {todo.description && (
+      {description && (
         <Collapse in={open}>
           <Typography variant="body2" sx={{ p: 1 }}>
-            {todo.description}
+            {description}
           </Typography>
         </Collapse>
       )}

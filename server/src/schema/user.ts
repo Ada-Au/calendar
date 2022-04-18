@@ -12,7 +12,7 @@ export const AuthPayload = objectType({
   name: 'AuthPayload',
   description: 'Authentication Payload.',
   definition(t) {
-    t.nonNull.string('token', { description: 'Authentication token.' })
+    t.string('token', { description: 'Authentication token.' })
   },
 })
 
@@ -159,7 +159,7 @@ export const UserMutation = extendType({
       },
     })
     t.nonNull.field('signUp', {
-      type: 'AuthPayload',
+      type: 'User',
       description: 'User sign up in site.',
       args: {
         name: nonNull(stringArg({ description: 'The user name.' })),

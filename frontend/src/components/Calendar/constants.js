@@ -1,7 +1,7 @@
 export const DAY_IN_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 export const DAY_IN_WEEK_STYLE = {
-  bgcolor: 'highlight.main',
-  color: 'highlight.contrastText',
+  bgcolor: 'primary.main',
+  color: 'primary.contrastText',
   textAlign: 'center',
 };
 

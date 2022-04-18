@@ -106,8 +106,7 @@ function Drawer({ onToggle }) {
           <Typography variant="h6">Tasks</Typography>
         </ListItem>
         {/* Todo: map tasks & todos */}
-        <div style={{ flex: 1 }}></div>
-        <Divider />
+        <Divider sx={{ mt: 'auto' }} />
         <DrawerItem label="Setting" icon={<SettingsIcon />} />
         <DrawerItem
           label="Logout"

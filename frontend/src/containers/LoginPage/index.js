@@ -32,7 +32,7 @@ const LOGIN = gql`
 const SIGN_UP = gql`
   mutation SignUp($name: String!, $email: String!, $password: String!) {
     signUp(name: $name, email: $email, password: $password) {
-      token
+      id
     }
   }
 `;
@@ -104,13 +104,15 @@ function LoginPage() {
   const [signUp, { loading: signUpLoading }] = useMutation(SIGN_UP, {
     onError: (error) => {
       let { message } = error;
-      if (message.includes('No user found for email')) {
+      console.log(error);
+      if (message.includes('registered with another account')) {
         setEmailError(true);
       } else if (message.includes('Invalid Password')) {
         setPwError(true);
       }
+      errorNotification(message);
     },
-    onCompleted: () => {
+    onCompleted: (data) => {
       successNotification('Account created!');
       setIsLogin(true);
     },
@@ -123,7 +125,7 @@ function LoginPage() {
     if (prop === 'password' && pwError) {
       setPwError(false);
     }
-    if (prop === 'ConfirmPassword' && confirmPwError) {
+    if (prop === 'confirmPw' && confirmPwError) {
       setConfirmPwError(false);
     }
     if (prop === 'name' && nameError) {
@@ -169,7 +171,6 @@ function LoginPage() {
       hashPassword(password).then((hashedPassword) => {
         signUp({ variables: { name, email, password: hashedPassword } });
       });
-      setIsLogin(true);
     }
   };
 
@@ -252,7 +253,10 @@ function LoginPage() {
           <PasswordField onChange={handleChange('password')} error={pwError} />
 
           <Label variant="body2">Confirm Password</Label>
-          <PasswordField onChange={handleChange('confirmPw')} error={pwError} />
+          <PasswordField
+            onChange={handleChange('confirmPw')}
+            error={confirmPwError}
+          />
 
           <Button
             variant="contained"

@@ -7,6 +7,7 @@ const lightGrey = '#CBD5D5';
 const gainsboro = '#D9E4E4';
 const cultured = '#EAF1F1';
 const lightCultured = '#F4F9F9';
+const red = '#F33';
 
 export default createTheme({
   palette: {
@@ -22,6 +23,7 @@ export default createTheme({
       plain: `${cultured}`,
       white: `${lightCultured}`,
       highlight: `${graniteGray}`,
+      red: `${red}`,
     },
     primary: {
       main: `${jet}`,
@@ -40,8 +42,8 @@ export default createTheme({
       contrastText: `${cultured}`,
     },
     highlight: {
-      main: `${richBlack}`,
-      contrastText: `${cultured}`,
+      main: `${red}`,
+      contrastText: `${richBlack}`,
     },
     hover: {
       main: `${lightGrey}`,

@@ -22,6 +22,7 @@ model Task {
   title         String
   description   String?
   completed     Boolean     @default(false)
+  updatedAt     DateTime    @updatedAt
   startTime     DateTime    @default(now())
   endTime       DateTime?
   isFullDay     Boolean     @default(false)
