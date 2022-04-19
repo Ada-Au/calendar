@@ -42,11 +42,15 @@ const Wrapper = styled('div')(() => ({
 
 function TodoItem({ id, isEdit, isDelete, onToggleDelete }) {
   const [open, setOpen] = useState(false);
-  const { data, loading, error } = useQuery(TODO, {
+  const { data, loading, error, refetch } = useQuery(TODO, {
     variables: { where: { id } },
   });
 
-  const [toggleCompleteTodo] = useMutation(TOGGLE_COMPLETE_TODO);
+  const [toggleCompleteTodo] = useMutation(TOGGLE_COMPLETE_TODO, {
+    onCompleted: () => {
+      refetch();
+    },
+  });
 
   const handleToggleComplete = () => {
     toggleCompleteTodo({ variables: { id } });
@@ -67,16 +71,14 @@ function TodoItem({ id, isEdit, isDelete, onToggleDelete }) {
   return (
     <Paper sx={{ p: 1, my: 1 }}>
       <Wrapper>
-        {isEdit ? (
-          <Checkbox
-            indeterminate={isDelete}
-            onChange={handleToggleDelete}
-            color="highlight"
-            sx={{ color: 'highlight.main' }}
-          />
-        ) : (
-          <Checkbox checked={completed} onChange={handleToggleComplete} />
-        )}
+        <Checkbox
+          indeterminate={isEdit ? isDelete : false}
+          checked={isEdit ? false : completed}
+          onChange={isEdit ? handleToggleDelete : handleToggleComplete}
+          color={isEdit ? 'highlight' : 'primary'}
+          sx={{ color: isEdit ? 'highlight.main' : '' }}
+        />
+
         <Typography>{title}</Typography>
         {description && (
           <IconButton

@@ -47,7 +47,6 @@ const TOGGLE_COMPLETE_TASK = gql`
   mutation ToggleCompleteTask($id: Int!) {
     toggleCompleteTask(id: $id) {
       id
-      title
       completed
     }
   }
@@ -60,8 +59,6 @@ const UPDATE_ONE_TASK = gql`
   ) {
     updateOneTask(data: $data, where: $where) {
       id
-      title
-      completed
     }
   }
 `;
@@ -92,22 +89,24 @@ function TaskPage() {
   const [deleteItems, setDeleteItems] = useState([]);
 
   const { id } = useParams();
+  const [toggleCompleteTodo] = useMutation(TOGGLE_COMPLETE_TASK, {
+    onCompleted: () => {
+      refetch();
+    },
+  });
+  const [updateOneTask] = useMutation(UPDATE_ONE_TASK, {
+    onError: (error) => {
+      errorNotification(error.message);
+    },
+    onCompleted: () => {
+      refetch();
+      setIsEdit(false);
+      successNotification('Task updated');
+    },
+  });
   const { data, loading, error, refetch } = useQuery(TASK, {
     variables: { id: +id },
   });
-  const [updateOneTask, { loading: updateLoading }] = useMutation(
-    UPDATE_ONE_TASK,
-    {
-      onError: (error) => {
-        errorNotification(error.message);
-      },
-      onCompleted: () => {
-        refetch();
-        setIsEdit(false);
-        successNotification('Task updated');
-      },
-    }
-  );
 
   const fullOptions = {
     year: 'numeric',
@@ -200,6 +199,10 @@ function TaskPage() {
     setEndTimeError(false);
   };
 
+  const handleToggleComplete = () => {
+    toggleCompleteTodo({ variables: { id: +id } });
+  };
+
   const formatDate = (dateVal) => {
     var newDate = new Date(dateVal);
 
@@ -277,10 +280,8 @@ function TaskPage() {
                 label="Complete"
                 control={
                   <Checkbox
-                    value={completed}
-                    onChange={() => {
-                      console.log('todo: update');
-                    }}
+                    checked={completed}
+                    onChange={handleToggleComplete}
                   />
                 }
               />
@@ -370,6 +371,7 @@ function TaskPage() {
           {isCreate && <NewTodo taskId={id} onToggle={handleCreateTodo} />}
           {todos.map((todo) => (
             <TodoItem
+              key={todo.id}
               id={todo.id}
               isEdit={isEdit}
               isDelete={deleteItems.includes(todo.id)}

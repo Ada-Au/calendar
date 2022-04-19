@@ -67,7 +67,7 @@ function Drawer({ onToggle }) {
 
   const handleToggle = () => {
     setShow((prev) => !prev);
-    onToggle();
+    onToggle && onToggle();
   };
 
   if (loading) return <LoadingSpinner />;
