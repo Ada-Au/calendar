@@ -115,9 +115,6 @@ function MonthItem({
     style = { ...style, ...SELECT_STYLE };
   }
 
-  // todo: get task
-  const text =
-    'test bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
   let todayTask;
   if (tasks)
     todayTask = tasks.filter((task) =>
@@ -126,7 +123,6 @@ function MonthItem({
         : compareDate(new Date(task.startTime), showDate, -1) &&
           compareDate(new Date(task.endTime), showDate, 1)
     );
-  // console.log(showDate.getDate(), todayTask);
 
   return (
     <Box
@@ -135,7 +131,6 @@ function MonthItem({
       onMouseUp={handleMouseUp}
       onMouseOver={handleMouseOver}
       style={{ minWidth: 0, width: '100%', minHeight: 0 }}
-      // style={{ display: 'grid', gridColumn: '1 / span 7' }}
     >
       <Item id={index} sx={style}>
         {showDate.getDate()}
@@ -159,6 +154,7 @@ function MonthItem({
           ))}
         {todayTask && todayTask.length > 4 && (
           <Typography variant="caption">
+            {/* todo: show all task in day */}
             {todayTask.length - 3} more...
           </Typography>
         )}

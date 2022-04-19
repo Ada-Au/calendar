@@ -15,6 +15,7 @@ import theme from './theme';
 import HomePage from './containers/HomePage';
 import LoginPage from './containers/LoginPage';
 import TaskPage from './containers/TaskPage';
+import TaskCreatePage from './containers/TaskCreatePage';
 
 function App() {
   let history = createBrowserHistory();
@@ -31,6 +32,7 @@ function App() {
               <Route exact path="/home" element={<HomePage />} />
               <Route exact path="/" element={<LoginPage />} />
               <Route path="/task/:id" element={<TaskPage />} />
+              <Route path="/createTask" element={<TaskCreatePage />} />
             </Routes>
           </BrowserRouter>
           {/* </LanguageProvider> */}

@@ -44,7 +44,7 @@ export default createTheme({
     },
     highlight: {
       main: `${red}`,
-      contrastText: `${richBlack}`,
+      contrastText: '#fff',
     },
     hover: {
       main: `${lightGrey}`,

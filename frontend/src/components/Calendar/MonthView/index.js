@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
 import {
   styled,
   Grid,
@@ -67,6 +68,7 @@ const Wrapper = styled(Box)(() => ({
 
 // todo: show task time when hide drawer
 function MonthView({ diff = 0, showTaskTime }) {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState({});
   const [dayBeforeMonth, setDayBeforeMonth] = useState({});
   const [viewingDate, setViewingDate] = useState(
@@ -110,8 +112,11 @@ function MonthView({ diff = 0, showTaskTime }) {
   };
 
   const handleCreate = () => {
-    console.log(selectedDate);
+    navigate('/createTask', {
+      state: { start: selectedDate.start, end: selectedDate.end },
+    });
   };
+
   if (loading) return <LoadingSpinner />;
   if (error) {
     console.log('error', error);

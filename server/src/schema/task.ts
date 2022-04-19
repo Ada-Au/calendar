@@ -1,4 +1,4 @@
-import { objectType, extendType, list, nonNull, intArg } from 'nexus'
+import { objectType, extendType, list, nonNull, intArg, floatArg } from 'nexus'
 import dayjs from 'dayjs'
 import createError from 'http-errors'
 
@@ -67,6 +67,9 @@ export const TaskQuery = extendType({
             )
           else
             return (
+              task.endTime &&
+              month &&
+              year &&
               task.startTime.getMonth() <= month &&
               task.endTime.getMonth() >= month &&
               task.startTime.getFullYear() <= year &&
@@ -75,11 +78,27 @@ export const TaskQuery = extendType({
         })
       },
     })
-    t.crud.user()
-    t.crud.users({
-      ordering: true,
-      filtering: true,
-      pagination: true,
+    t.field('myTasksFromDate', {
+      type: list(nonNull('Task')),
+      description: 'Get my tasks data',
+      args: {
+        date: floatArg({
+          description: 'The date to lookup my tasks after.',
+        }),
+      },
+      async resolve(_root, { date }, { user, prisma }) {
+        const tasks = await prisma.task.findMany({
+          where: { userId: user.id },
+          orderBy: { startTime: 'asc' },
+        })
+
+        return tasks.filter((task) => {
+          if (date)
+            if (task.isFullDay) return task.startTime.getTime() >= date
+            else return task.endTime && task.endTime.getTime() >= date
+          return false
+        })
+      },
     })
   },
 })
@@ -90,6 +109,7 @@ export const TaskMutation = extendType({
   definition(t) {
     t.crud.createOneTask()
     t.crud.updateOneTask()
+    t.crud.deleteOneTask()
     t.nonNull.field('toggleCompleteTask', {
       type: 'Task',
       description: 'Toggle the completeness of Task.',

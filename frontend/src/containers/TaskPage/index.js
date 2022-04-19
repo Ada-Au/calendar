@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
 import {
   styled,
   Box,
@@ -9,6 +10,9 @@ import {
   FormControlLabel,
   IconButton,
   TextField,
+  Button,
+  Paper,
+  Modal,
 } from '@mui/material';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import { useParams } from 'react-router-dom';
@@ -17,6 +21,7 @@ import 'react-calendar/dist/Calendar.css';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import Drawer from '../../components/Drawer';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -27,6 +32,7 @@ import {
   successNotification,
 } from '../../components/Notification';
 import { formatDate } from '../../components/DateManager';
+import BackButton from '../../components/BackButton';
 
 const TASK = gql`
   query Task($id: Int!) {
@@ -49,6 +55,14 @@ const TOGGLE_COMPLETE_TASK = gql`
     toggleCompleteTask(id: $id) {
       id
       completed
+    }
+  }
+`;
+
+const DELETE_ONE_TASK = gql`
+  mutation DeleteOneTask($where: TaskWhereUniqueInput!) {
+    deleteOneTask(where: $where) {
+      id
     }
   }
 `;
@@ -82,17 +96,28 @@ const Wrapper = styled(Box)(({ theme }) => ({
 }));
 
 function TaskPage() {
+  const navigate = useNavigate();
   const [isCreate, setIsCreate] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [endTimeError, setEndTimeError] = useState(false);
   const [titleError, setTitleError] = useState(false);
   const [taskData, setTaskData] = useState({});
   const [deleteItems, setDeleteItems] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const { id } = useParams();
   const [toggleCompleteTodo] = useMutation(TOGGLE_COMPLETE_TASK, {
     onCompleted: () => {
       refetch();
+    },
+  });
+  const [deleteOneTask] = useMutation(DELETE_ONE_TASK, {
+    onError: (error) => {
+      errorNotification(error.message);
+    },
+    onCompleted: () => {
+      successNotification('Task deleted');
+      navigate('/home', { replace: true });
     },
   });
   const [updateOneTask] = useMutation(UPDATE_ONE_TASK, {
@@ -200,11 +225,19 @@ function TaskPage() {
 
   const handleChangeEndTime = (time) => {
     setTaskData({ ...taskData, endTime: new Date(time).toISOString() });
-    setEndTimeError(false);
+    if (endTimeError) setEndTimeError(false);
   };
 
   const handleToggleComplete = () => {
     toggleCompleteTodo({ variables: { id: +id } });
+  };
+
+  const handleOpenModal = () => {
+    setOpen(true);
+  };
+
+  const handleDelete = () => {
+    deleteOneTask({ variables: { where: { id: +id } } });
   };
 
   if (loading) return <LoadingSpinner />;
@@ -229,7 +262,8 @@ function TaskPage() {
       <Wrapper>
         <Drawer />
         <ContentWrapper>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 8, pb: 1 }}>
+          <BackButton sx={{ pt: 8 }} />
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 1, pb: 1 }}>
             {isEdit ? (
               <TextField
                 sx={{ width: 420 }}
@@ -252,16 +286,29 @@ function TaskPage() {
               <IconButton onClick={handleEdit(data.task)}>
                 <EditIcon sx={isEdit ? { color: 'highlight.main' } : {}} />
               </IconButton>
-              <FormControlLabel
-                sx={{ pl: 1 }}
-                label="Complete"
-                control={
-                  <Checkbox
-                    checked={completed}
-                    onChange={handleToggleComplete}
-                  />
-                }
-              />
+              {isEdit ? (
+                <Box sx={{ pl: 2 }}>
+                  <Button
+                    variant="contained"
+                    color="highlight"
+                    onClick={handleOpenModal}
+                    startIcon={<DeleteIcon />}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+              ) : (
+                <FormControlLabel
+                  sx={{ pl: 1 }}
+                  label="Complete"
+                  control={
+                    <Checkbox
+                      checked={completed}
+                      onChange={handleToggleComplete}
+                    />
+                  }
+                />
+              )}
             </Box>
           </Box>
           {isEdit ? (
@@ -356,6 +403,43 @@ function TaskPage() {
             />
           ))}
         </ContentWrapper>
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <Paper
+            sx={{
+              p: 4,
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '300px',
+            }}
+          >
+            <Typography variant="h5" component="h2">
+              Confirm delete?
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Confirm to delete the task and every todo connected to task.
+            </Typography>
+            <Box
+              sx={{ justifyContent: 'space-between', display: 'flex', pt: 3 }}
+            >
+              <Button
+                variant="contained"
+                color="highlight"
+                onClick={handleDelete}
+              >
+                Confirm
+              </Button>
+              <Button
+                sx={{ ml: 'auto' }}
+                variant="outlined"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </Paper>
+        </Modal>
       </Wrapper>
     </Box>
   );

@@ -601,6 +601,7 @@ export interface NexusGenFieldTypes {
     createOneTodo: NexusGenRootTypes['Todo']; // Todo!
     createOneUser: NexusGenRootTypes['User']; // User!
     deleteManyUser: NexusGenRootTypes['AffectedRowsOutput']; // AffectedRowsOutput!
+    deleteOneTask: NexusGenRootTypes['Task'] | null; // Task
     deleteOneUser: NexusGenRootTypes['User'] | null; // User
     login: NexusGenRootTypes['AuthPayload']; // AuthPayload!
     signUp: NexusGenRootTypes['User']; // User!
@@ -615,6 +616,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     me: NexusGenRootTypes['User'] | null; // User
     myTasks: NexusGenRootTypes['Task'][] | null; // [Task!]
+    myTasksFromDate: NexusGenRootTypes['Task'][] | null; // [Task!]
     task: NexusGenRootTypes['Task'] | null; // Task
     tasks: NexusGenRootTypes['Task'][]; // [Task!]!
     todo: NexusGenRootTypes['Todo'] | null; // Todo
@@ -667,6 +669,7 @@ export interface NexusGenFieldTypeNames {
     createOneTodo: 'Todo'
     createOneUser: 'User'
     deleteManyUser: 'AffectedRowsOutput'
+    deleteOneTask: 'Task'
     deleteOneUser: 'User'
     login: 'AuthPayload'
     signUp: 'User'
@@ -681,6 +684,7 @@ export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     me: 'User'
     myTasks: 'Task'
+    myTasksFromDate: 'Task'
     task: 'Task'
     tasks: 'Task'
     todo: 'Todo'
@@ -735,6 +739,9 @@ export interface NexusGenArgTypes {
     deleteManyUser: { // args
       where?: NexusGenInputs['UserWhereInput'] | null; // UserWhereInput
     }
+    deleteOneTask: { // args
+      where: NexusGenInputs['TaskWhereUniqueInput']; // TaskWhereUniqueInput!
+    }
     deleteOneUser: { // args
       where: NexusGenInputs['UserWhereUniqueInput']; // UserWhereUniqueInput!
     }
@@ -779,6 +786,9 @@ export interface NexusGenArgTypes {
     myTasks: { // args
       month?: number | null; // Int
       year?: number | null; // Int
+    }
+    myTasksFromDate: { // args
+      date?: number | null; // Float
     }
     task: { // args
       where: NexusGenInputs['TaskWhereUniqueInput']; // TaskWhereUniqueInput!

@@ -119,21 +119,24 @@ function LoginPage() {
   });
 
   const handleChange = (prop) => (event) => {
-    if (prop === 'email' && emailError) {
-      setEmailError(false);
-    }
-    if (prop === 'password' && pwError) {
-      setPwError(false);
-    }
-    if (prop === 'confirmPw' && confirmPwError) {
-      setConfirmPwError(false);
-    }
-    if (prop === 'name' && nameError) {
-      setNameError(false);
-    }
+    cleanError(prop);
     setValues({ ...values, [prop]: event.target.value });
   };
 
+  const cleanError = (prop) => {
+    if ((prop === 'email' || prop === 'all') && emailError) {
+      setEmailError(false);
+    }
+    if ((prop === 'password' || prop === 'all') && pwError) {
+      setPwError(false);
+    }
+    if ((prop === 'confirmPw' || prop === 'all') && confirmPwError) {
+      setConfirmPwError(false);
+    }
+    if ((prop === 'name' || prop === 'all') && nameError) {
+      setNameError(false);
+    }
+  };
   const handleLogin = () => {
     const { email, password } = values;
     if (!email) {
@@ -180,10 +183,7 @@ function LoginPage() {
 
   const ChangePage = () => {
     setIsLogin((prev) => !prev);
-    setNameError(false);
-    setEmailError(false);
-    setPwError(false);
-    setConfirmPwError(false);
+    cleanError('all');
   };
 
   return (

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { styled, Box } from '@mui/material';
-import 'react-calendar/dist/Calendar.css';
 
 import Calendar from '../../components/Calendar';
 import Drawer from '../../components/Drawer';

@@ -76,6 +76,7 @@ type Mutation {
   createOneTodo(data: TodoCreateInput!): Todo!
   createOneUser(data: UserCreateInput!): User!
   deleteManyUser(where: UserWhereInput): AffectedRowsOutput!
+  deleteOneTask(where: TaskWhereUniqueInput!): Task
   deleteOneUser(where: UserWhereUniqueInput!): User
 
   """Normal email and password login."""
@@ -213,6 +214,12 @@ type Query {
 
     """The year to lookup my tasks in."""
     year: Int
+  ): [Task!]
+
+  """Get my tasks data"""
+  myTasksFromDate(
+    """The date to lookup my tasks after."""
+    date: Float
   ): [Task!]
   task(where: TaskWhereUniqueInput!): Task
   tasks(cursor: TaskWhereUniqueInput, orderBy: [TaskOrderByInput!], skip: Int, take: Int, where: TaskWhereInput): [Task!]!
