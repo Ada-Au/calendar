@@ -2,7 +2,7 @@ import { createTheme } from '@mui/material/styles';
 
 const richBlack = '#051014';
 const jet = '#2E2F2F';
-const graniteGray = '#646969';
+const nickel = '#767A7A';
 const lightGrey = '#CBD5D5';
 const gainsboro = '#D9E4E4';
 const cultured = '#EAF1F1';
@@ -13,17 +13,18 @@ export default createTheme({
   palette: {
     text: {
       primary: `${richBlack}`,
-      secondary: `${graniteGray}`,
+      secondary: `${nickel}`,
     },
     common: {
       black: `${richBlack}`,
-      darkGrey: `${jet}`,
+      lightBlack: `${jet}`,
+      darkGrey: `${nickel}`,
       grey: `${lightGrey}`,
       lightGrey: `${gainsboro}`,
       plain: `${cultured}`,
       white: `${lightCultured}`,
-      highlight: `${graniteGray}`,
       red: `${red}`,
+      highlight: `${nickel}`,
     },
     primary: {
       main: `${jet}`,
@@ -38,7 +39,7 @@ export default createTheme({
       contrastText: `${richBlack}`,
     },
     select: {
-      main: `${graniteGray}`,
+      main: `${nickel}`,
       contrastText: `${cultured}`,
     },
     highlight: {

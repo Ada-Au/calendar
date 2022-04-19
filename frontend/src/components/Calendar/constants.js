@@ -36,6 +36,6 @@ export const SELECT_STYLE = {
 };
 
 export const TODAY_STYLE = {
-  bgcolor: 'common.darkGrey',
+  bgcolor: 'common.lightBlack',
   color: 'common.plain',
 };

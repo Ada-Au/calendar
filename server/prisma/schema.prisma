@@ -29,6 +29,8 @@ model Task {
   todos         Todo[]
   userId        Int
   user          User        @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "fk_user")
 }
 
 model Todo {

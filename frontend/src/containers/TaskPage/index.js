@@ -26,6 +26,7 @@ import {
   errorNotification,
   successNotification,
 } from '../../components/Notification';
+import { formatDate } from '../../components/DateManager';
 
 const TASK = gql`
   query Task($id: Int!) {
@@ -154,9 +155,12 @@ function TaskPage() {
     if (!taskData.title) {
       setTitleError(true);
       errorNotification('No title is set');
-    } else if (!isFullDay && !taskData.endTime) {
+    } else if (!taskData.isFullDay && !taskData.endTime) {
       setEndTimeError(true);
       errorNotification('No end time is set');
+    } else if (!taskData.isFullDay && taskData.endTime < taskData.startTime) {
+      setEndTimeError(true);
+      errorNotification('End time is before start time');
     } else {
       const deleteTodos = deleteItems.reduce(
         (list, item) => [...list, { id: item }],
@@ -202,33 +206,6 @@ function TaskPage() {
   const handleToggleComplete = () => {
     toggleCompleteTodo({ variables: { id: +id } });
   };
-
-  const formatDate = (dateVal) => {
-    var newDate = new Date(dateVal);
-
-    var sMonth = padValue(newDate.getMonth() + 1);
-    var sDay = padValue(newDate.getDate());
-    var sYear = newDate.getFullYear();
-    var sHour = newDate.getHours();
-    var sMinute = padValue(newDate.getMinutes());
-    var iHourCheck = parseInt(sHour);
-    var sAMPM = 'am';
-
-    if (iHourCheck > 12) {
-      sAMPM = 'pm';
-      sHour = iHourCheck - 12;
-    } else if (iHourCheck === 0) {
-      sHour = '12';
-    }
-
-    sHour = padValue(sHour);
-
-    return `${sMonth}/${sDay}/${sYear} ${sHour}:${sMinute} ${sAMPM}`;
-  };
-
-  function padValue(value) {
-    return value < 10 ? '0' + value : value;
-  }
 
   if (loading) return <LoadingSpinner />;
   if (error) {

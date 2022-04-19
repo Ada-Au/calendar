@@ -1,4 +1,4 @@
-import { objectType, extendType, nonNull, intArg } from 'nexus'
+import { objectType, extendType, list, nonNull, intArg } from 'nexus'
 import dayjs from 'dayjs'
 import createError from 'http-errors'
 
@@ -29,6 +29,7 @@ export const Task = objectType({
       filtering: true,
       pagination: true,
     })
+    t.model.user()
   },
 })
 
@@ -38,6 +39,44 @@ export const TaskQuery = extendType({
   definition(t) {
     t.crud.task()
     t.crud.tasks({
+      ordering: true,
+      filtering: true,
+      pagination: true,
+    })
+    t.field('myTasks', {
+      type: list(nonNull('Task')),
+      description: 'Get my tasks data',
+      args: {
+        month: intArg({
+          description: 'The month to lookup my tasks in.',
+        }),
+        year: intArg({
+          description: 'The year to lookup my tasks in.',
+        }),
+      },
+      async resolve(_root, { month, year }, { user, prisma }) {
+        const tasks = await prisma.task.findMany({
+          where: { userId: user.id },
+          orderBy: { startTime: 'asc' },
+        })
+        return tasks.filter((task) => {
+          if (task.isFullDay)
+            return (
+              task.startTime.getMonth() == month &&
+              task.startTime.getFullYear() == year
+            )
+          else
+            return (
+              task.startTime.getMonth() <= month &&
+              task.endTime.getMonth() >= month &&
+              task.startTime.getFullYear() <= year &&
+              task.endTime.getFullYear() >= year
+            )
+        })
+      },
+    })
+    t.crud.user()
+    t.crud.users({
       ordering: true,
       filtering: true,
       pagination: true,

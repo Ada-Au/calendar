@@ -205,6 +205,15 @@ input NullableStringFieldUpdateOperationsInput {
 type Query {
   """Get my user data"""
   me: User
+
+  """Get my tasks data"""
+  myTasks(
+    """The month to lookup my tasks in."""
+    month: Int
+
+    """The year to lookup my tasks in."""
+    year: Int
+  ): [Task!]
   task(where: TaskWhereUniqueInput!): Task
   tasks(cursor: TaskWhereUniqueInput, orderBy: [TaskOrderByInput!], skip: Int, take: Int, where: TaskWhereInput): [Task!]!
   todo(where: TodoWhereUniqueInput!): Todo
@@ -276,6 +285,7 @@ type Task {
 
   """When the task is last updated."""
   updatedAt: DateTime!
+  user: User!
 }
 
 input TaskCreateInput {

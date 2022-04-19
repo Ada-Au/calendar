@@ -614,6 +614,7 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     me: NexusGenRootTypes['User'] | null; // User
+    myTasks: NexusGenRootTypes['Task'][] | null; // [Task!]
     task: NexusGenRootTypes['Task'] | null; // Task
     tasks: NexusGenRootTypes['Task'][]; // [Task!]!
     todo: NexusGenRootTypes['Todo'] | null; // Todo
@@ -633,6 +634,7 @@ export interface NexusGenFieldTypes {
     title: string; // String!
     todos: NexusGenRootTypes['Todo'][]; // [Todo!]!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    user: NexusGenRootTypes['User']; // User!
   }
   Todo: { // field return type
     completed: boolean; // Boolean!
@@ -678,6 +680,7 @@ export interface NexusGenFieldTypeNames {
   }
   Query: { // field return type name
     me: 'User'
+    myTasks: 'Task'
     task: 'Task'
     tasks: 'Task'
     todo: 'Todo'
@@ -697,6 +700,7 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
     todos: 'Todo'
     updatedAt: 'DateTime'
+    user: 'User'
   }
   Todo: { // field return type name
     completed: 'Boolean'
@@ -772,6 +776,10 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    myTasks: { // args
+      month?: number | null; // Int
+      year?: number | null; // Int
+    }
     task: { // args
       where: NexusGenInputs['TaskWhereUniqueInput']; // TaskWhereUniqueInput!
     }

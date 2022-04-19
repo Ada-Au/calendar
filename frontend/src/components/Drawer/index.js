@@ -31,7 +31,7 @@ const ME = gql`
 `;
 
 const UserEmail = styled(Typography)(({ theme }) => ({
-  color: theme.palette.common.darkGrey,
+  color: theme.palette.common.lightBlack,
 }));
 
 const ListWrapper = styled(List, {
@@ -73,6 +73,7 @@ function Drawer({ onToggle }) {
   if (loading) return <LoadingSpinner />;
   if (error) {
     console.log('error', error);
+    // todo: create error page
     return;
   }
 
